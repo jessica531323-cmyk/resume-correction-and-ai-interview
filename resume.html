@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>简历诊断 | 求职面试助手</title>
+    <meta name="description" content="输入岗位描述与简历，输出问题点与修改建议（MVP 原型）。" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: {
+              soft: "0 10px 30px rgba(2, 6, 23, 0.10)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-soft">
+            <i class="fa-solid fa-briefcase"></i>
+          </a>
+          <div class="min-w-0">
+            <div class="text-sm font-semibold leading-4">简历诊断</div>
+            <div class="text-xs text-slate-500">入口模块：岗位描述 + 简历 → 问题点与修改建议</div>
+          </div>
+        </div>
+
+        <nav class="hidden items-center gap-2 sm:flex">
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="jobs.html">岗位推荐</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="gap.html">能力差距</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="interview.html">模拟面试</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <section class="grid gap-4 lg:grid-cols-2">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-file-pen"></i><span>输入区</span>
+              </div>
+              <h1 class="mt-3 text-xl font-extrabold">粘贴岗位描述与简历</h1>
+              <p class="mt-1 text-sm text-slate-600">支持文本粘贴与上传文件读取（MVP：本地解析）。</p>
+            </div>
+            <button
+              id="btnSample"
+              class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              type="button"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>填充示例
+            </button>
+          </div>
+
+          <div class="mt-5 grid gap-4">
+            <div>
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <label class="text-sm font-semibold" for="jd">岗位描述（JD）</label>
+                <div class="flex items-center gap-2">
+                  <label class="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50">
+                    <i class="fa-solid fa-upload mr-2"></i>上传 JD
+                    <input id="jdFile" class="hidden" type="file" accept=".txt,.md,.doc,.docx,.pdf" />
+                  </label>
+                  <button id="btnClearJD" class="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100" type="button">
+                    清空
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="jd"
+                class="h-44 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
+                placeholder="例如：岗位职责、任职要求、技术栈、加分项…"
+              ></textarea>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                  <i class="fa-regular fa-circle-info"></i>
+                  <span>建议包含：业务背景 / 技术要求 / 关键指标</span>
+                </div>
+                <span id="jdCount">0 字</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <label class="text-sm font-semibold" for="resume">简历（文本）</label>
+                <div class="flex items-center gap-2">
+                  <label class="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50">
+                    <i class="fa-solid fa-upload mr-2"></i>上传简历
+                    <input id="resumeFile" class="hidden" type="file" accept=".txt,.md,.doc,.docx,.pdf" />
+                  </label>
+                  <button
+                    id="btnClearResume"
+                    class="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                    type="button"
+                  >
+                    清空
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="resume"
+                class="h-56 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
+                placeholder="建议包含：个人简介 / 技能栈 / 项目经历（STAR）/ 量化结果 / 教育背景…"
+              ></textarea>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                  <i class="fa-regular fa-circle-info"></i>
+                  <span>尽量量化：提升多少、节省多少、带来多少增长</span>
+                </div>
+                <span id="resumeCount">0 字</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <button
+              id="btnAnalyze"
+              class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              type="button"
+            >
+              <i class="fa-solid fa-magnifying-glass mr-2"></i>开始诊断
+            </button>
+            <button
+              id="btnSave"
+              class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+              type="button"
+            >
+              <i class="fa-regular fa-floppy-disk mr-2"></i>保存输入
+            </button>
+            <a
+              id="btnNext"
+              href="jobs.html"
+              class="pointer-events-none inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-400"
+              aria-disabled="true"
+            >
+              下一步：岗位推荐<i class="fa-solid fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+          <div id="toast" class="mt-3 hidden rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900"></div>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-stethoscope"></i><span>输出区</span>
+              </div>
+              <h2 class="mt-3 text-xl font-extrabold">诊断结果（示例结构）</h2>
+              <p class="mt-1 text-sm text-slate-600">该区域用于对齐信息层级与后端接口形状。</p>
+            </div>
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50">
+              <i class="fa-solid fa-layer-group text-slate-900"></i>
+            </div>
+          </div>
+
+          <div id="emptyState" class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white">
+              <i class="fa-regular fa-file-lines text-slate-900"></i>
+            </div>
+            <div class="mt-3 text-sm font-semibold">还没有诊断结果</div>
+            <div class="mt-1 text-sm text-slate-600">点击左侧「开始诊断」生成示例结果。</div>
+          </div>
+
+          <div id="result" class="mt-6 hidden space-y-4">
+            <div class="grid gap-3 sm:grid-cols-3">
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="text-xs font-semibold text-slate-500">综合评分（示例）</div>
+                <div class="mt-2 flex items-end gap-2">
+                  <div id="score" class="text-3xl font-extrabold">78</div>
+                  <div class="text-sm text-slate-600">/ 100</div>
+                </div>
+                <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div id="scoreBar" class="h-2 w-[78%] rounded-full bg-slate-900"></div>
+                </div>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="text-xs font-semibold text-slate-500">风险点</div>
+                <div class="mt-2 text-sm font-semibold text-slate-900">数据不够量化</div>
+                <div class="mt-1 text-sm text-slate-600">缺少“提升/节省/增长”的指标。</div>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="text-xs font-semibold text-slate-500">优先动作</div>
+                <div class="mt-2 text-sm font-semibold text-slate-900">补齐 2 条关键成果</div>
+                <div class="mt-1 text-sm text-slate-600">把项目写成“问题-方案-结果”。</div>
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold">问题点</div>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">表达 / 结构 / 数据</span>
+              </div>
+              <div id="issues" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold">修改建议</div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">可直接落简历</span>
+              </div>
+              <div id="suggestions" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div class="rounded-3xl bg-slate-900 p-5 text-white">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold">下一步</div>
+                  <div class="mt-1 text-sm text-white/80">进入岗位推荐 → 选择目标岗位 → 做能力差距与模拟面试。</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <a href="jobs.html" class="inline-flex items-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100">
+                    去岗位推荐<i class="fa-solid fa-arrow-right ml-2"></i>
+                  </a>
+                  <a href="gap.html" class="inline-flex items-center rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/15">
+                    去能力差距
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-600">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-regular fa-circle-check"></i>
+            <span>提示：上传 PDF/DOCX 在纯前端原型中会退化为“读取失败提示”。MVP 仅演示结构与流程。</span>
+          </div>
+          <a class="font-semibold hover:text-slate-900" href="index.html">返回首页</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const StorageKeys = {
+        jd: "jia.jd",
+        resume: "jia.resume",
+        lastResumeDiagnosis: "jia.resumeDiagnosis",
+      };
+
+      const elJD = document.getElementById("jd");
+      const elResume = document.getElementById("resume");
+      const elToast = document.getElementById("toast");
+      const elNext = document.getElementById("btnNext");
+
+      function showToast(message, kind = "ok") {
+        elToast.classList.remove("hidden");
+        elToast.textContent = message;
+        elToast.className =
+          "mt-3 rounded-2xl border p-3 text-sm " +
+          (kind === "ok"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+            : kind === "warn"
+              ? "border-amber-200 bg-amber-50 text-amber-900"
+              : "border-rose-200 bg-rose-50 text-rose-900");
+        window.clearTimeout(showToast._t);
+        showToast._t = window.setTimeout(() => elToast.classList.add("hidden"), 2200);
+      }
+
+      function setCounts() {
+        document.getElementById("jdCount").textContent = `${(elJD.value || "").trim().length} 字`;
+        document.getElementById("resumeCount").textContent = `${(elResume.value || "").trim().length} 字`;
+      }
+
+      function enableNextIfReady() {
+        const ok = (elJD.value || "").trim().length > 20 && (elResume.value || "").trim().length > 50;
+        if (ok) {
+          elNext.classList.remove("pointer-events-none", "text-slate-400");
+          elNext.classList.add("text-slate-900", "hover:bg-slate-50");
+          elNext.removeAttribute("aria-disabled");
+        } else {
+          elNext.classList.add("pointer-events-none", "text-slate-400");
+          elNext.classList.remove("text-slate-900", "hover:bg-slate-50");
+          elNext.setAttribute("aria-disabled", "true");
+        }
+      }
+
+      function saveInputs() {
+        localStorage.setItem(StorageKeys.jd, elJD.value || "");
+        localStorage.setItem(StorageKeys.resume, elResume.value || "");
+        showToast("已保存输入（本地）");
+      }
+
+      function loadInputs() {
+        elJD.value = localStorage.getItem(StorageKeys.jd) || "";
+        elResume.value = localStorage.getItem(StorageKeys.resume) || "";
+        setCounts();
+        enableNextIfReady();
+      }
+
+      function setSample() {
+        const sampleJD =
+          "岗位：前端工程师（SaaS）\n职责：负责 B 端产品前端架构与组件建设；推动性能优化；与产品/后端协作交付。\n要求：React/TypeScript；Tailwind 或组件库；了解性能优化、可观测；有复杂表单/权限/多租户经验优先。";
+        const sampleResume =
+          "候选人：Daisy\n目标：前端工程师（B 端）\n\n项目：CRM 销售管理平台\n- 使用 React + TS + AntD 开发 20+ 页面，包含线索、商机、报价、合同等模块\n- 搭建通用表单与权限控制，减少重复开发\n- 性能优化：首屏从 3.2s 优化到 1.9s（懒加载 + 分包 + 缓存）\n\n项目：企业后台权限与审计\n- 设计 RBAC 权限模型，覆盖 6 类角色与 30+ 权限点\n- 接入埋点与日志，定位核心流程转化瓶颈\n\n技能：React / TypeScript / JavaScript / Node.js / Webpack / Git\n教育：本科";
+        elJD.value = sampleJD;
+        elResume.value = sampleResume;
+        saveInputs();
+        setCounts();
+        enableNextIfReady();
+      }
+
+      function looksLikeHasNumbers(text) {
+        return /(\d+(\.\d+)?\s*(%|倍|ms|s|秒|分钟|万|千|k|K|M|条|个|页|人|次))/.test(text || "");
+      }
+
+      function buildDiagnosis(jd, resume) {
+        const jdHasReact = /react/i.test(jd);
+        const jdHasTS = /typescript|ts/i.test(jd);
+        const resumeHasMetrics = looksLikeHasNumbers(resume);
+        const resumeHasSTAR = /(问题|背景|任务|行动|结果|STAR|挑战)/i.test(resume);
+
+        const issues = [];
+        issues.push({
+          type: "结构",
+          title: "项目经历缺少统一模板，阅读成本偏高",
+          detail: "建议每个项目固定为：背景/目标 → 关键工作 → 结果（量化） → 技术要点。",
+          severity: "中",
+        });
+        if (!resumeHasMetrics) {
+          issues.push({
+            type: "数据缺失",
+            title: "缺少可量化结果，难以证明价值",
+            detail: "补齐 2–3 条：首屏耗时、转化率、缺陷率、成本、效率等指标。",
+            severity: "高",
+          });
+        }
+        if (jdHasTS && !/typescript|ts/i.test(resume)) {
+          issues.push({
+            type: "表达",
+            title: "岗位强调 TypeScript，但简历未明确写出",
+            detail: "在技能栈与项目技术要点中补充 TS，写出类型约束、API 封装、工程化收益。",
+            severity: "高",
+          });
+        }
+        if (jdHasReact && !/react/i.test(resume)) {
+          issues.push({
+            type: "表达",
+            title: "岗位强调 React，但简历未明确写出",
+            detail: "在项目首行就写清：React + TS + 状态管理/路由/组件库。",
+            severity: "高",
+          });
+        }
+        if (!resumeHasSTAR) {
+          issues.push({
+            type: "结构",
+            title: "缺少“问题-方案-结果”的叙事链路",
+            detail: "每条 bullet 用“做了什么 → 怎么做 → 带来什么”闭环表达。",
+            severity: "中",
+          });
+        }
+
+        const suggestions = [];
+        suggestions.push({
+          title: "把每个项目的第一条 bullet 改成“业务目标 + 规模”",
+          example: "将“开发 20+ 页面”改为：“面向销售团队的 CRM，覆盖线索→商机→合同全链路，交付 20+ 页面”。",
+        });
+        suggestions.push({
+          title: "补齐 2 条量化成果（强建议）",
+          example: "例如：“首屏 3.2s→1.9s（-41%）”、“表单复用使新增页面开发从 2 天降到 1 天（-50%）”。",
+        });
+        suggestions.push({
+          title: "把“技能栈”改成与 JD 对齐的“能力组”",
+          example: "前端框架（React/TS）/ 工程化（分包、CI）/ 性能（指标与手段）/ 业务（权限、多租户、复杂表单）。",
+        });
+
+        const score = Math.max(
+          62,
+          Math.min(
+            92,
+            78 + (resumeHasMetrics ? 8 : -6) + (jdHasTS && /typescript|ts/i.test(resume) ? 6 : -4)
+          )
+        );
+
+        return { score, issues, suggestions };
+      }
+
+      function renderDiagnosis(data) {
+        document.getElementById("emptyState").classList.add("hidden");
+        document.getElementById("result").classList.remove("hidden");
+
+        document.getElementById("score").textContent = String(data.score);
+        document.getElementById("scoreBar").style.width = `${data.score}%`;
+
+        const issuesWrap = document.getElementById("issues");
+        issuesWrap.innerHTML = "";
+        for (const item of data.issues) {
+          const severityClass =
+            item.severity === "高"
+              ? "bg-rose-100 text-rose-900"
+              : item.severity === "中"
+                ? "bg-amber-100 text-amber-900"
+                : "bg-slate-100 text-slate-900";
+          const el = document.createElement("div");
+          el.className = "rounded-2xl border border-slate-200 bg-white p-4";
+          el.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-extrabold">${item.title}</div>
+                <div class="mt-1 text-sm text-slate-600">${item.detail}</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="rounded-full px-3 py-1 text-xs font-semibold ${severityClass}">优先级：${item.severity}</span>
+                <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">${item.type}</span>
+              </div>
+            </div>
+          `;
+          issuesWrap.appendChild(el);
+        }
+
+        const suggWrap = document.getElementById("suggestions");
+        suggWrap.innerHTML = "";
+        for (const s of data.suggestions) {
+          const el = document.createElement("div");
+          el.className = "rounded-2xl bg-slate-50 p-4";
+          el.innerHTML = `
+            <div class="text-sm font-extrabold">${s.title}</div>
+            <div class="mt-2 rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
+              <div class="text-xs font-semibold text-slate-500">可直接替换示例</div>
+              <div class="mt-1">${s.example}</div>
+            </div>
+          `;
+          suggWrap.appendChild(el);
+        }
+      }
+
+      async function readTextFile(file) {
+        if (!file) return "";
+        if (!/^text\/|application\/(json|xml)/.test(file.type) && !/\.(txt|md|json)$/i.test(file.name)) {
+          throw new Error("该原型仅支持读取 .txt/.md 等纯文本文件（PDF/DOCX 需后端解析）。");
+        }
+        return await file.text();
+      }
+
+      document.getElementById("btnAnalyze").addEventListener("click", () => {
+        const jd = (elJD.value || "").trim();
+        const resume = (elResume.value || "").trim();
+        if (jd.length < 20 || resume.length < 50) {
+          showToast("请先填写岗位描述（≥20字）与简历（≥50字）", "warn");
+          return;
+        }
+        saveInputs();
+        const data = buildDiagnosis(jd, resume);
+        localStorage.setItem(StorageKeys.lastResumeDiagnosis, JSON.stringify(data));
+        renderDiagnosis(data);
+        enableNextIfReady();
+        showToast("诊断已生成（示例）");
+      });
+
+      document.getElementById("btnSave").addEventListener("click", () => {
+        saveInputs();
+        enableNextIfReady();
+      });
+
+      document.getElementById("btnSample").addEventListener("click", () => setSample());
+      document.getElementById("btnClearJD").addEventListener("click", () => {
+        elJD.value = "";
+        setCounts();
+        enableNextIfReady();
+      });
+      document.getElementById("btnClearResume").addEventListener("click", () => {
+        elResume.value = "";
+        setCounts();
+        enableNextIfReady();
+      });
+
+      elJD.addEventListener("input", () => {
+        setCounts();
+        enableNextIfReady();
+      });
+      elResume.addEventListener("input", () => {
+        setCounts();
+        enableNextIfReady();
+      });
+
+      document.getElementById("jdFile").addEventListener("change", async (e) => {
+        try {
+          const file = e.target.files && e.target.files[0];
+          const text = await readTextFile(file);
+          elJD.value = text;
+          setCounts();
+          enableNextIfReady();
+          showToast(`已读取：${file.name}`);
+        } catch (err) {
+          showToast(err.message || "读取失败", "bad");
+        } finally {
+          e.target.value = "";
+        }
+      });
+
+      document.getElementById("resumeFile").addEventListener("change", async (e) => {
+        try {
+          const file = e.target.files && e.target.files[0];
+          const text = await readTextFile(file);
+          elResume.value = text;
+          setCounts();
+          enableNextIfReady();
+          showToast(`已读取：${file.name}`);
+        } catch (err) {
+          showToast(err.message || "读取失败", "bad");
+        } finally {
+          e.target.value = "";
+        }
+      });
+
+      loadInputs();
+
+      const cached = localStorage.getItem(StorageKeys.lastResumeDiagnosis);
+      if (cached) {
+        try {
+          renderDiagnosis(JSON.parse(cached));
+        } catch {}
+      }
+    </script>
+  </body>
+</html>
+

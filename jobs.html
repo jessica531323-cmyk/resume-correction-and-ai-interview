@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>岗位推荐 | 求职面试助手</title>
+    <meta name="description" content="基于用户画像与简历，生成岗位推荐列表（MVP 原型）。" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: { soft: "0 10px 30px rgba(2, 6, 23, 0.10)" },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-soft">
+            <i class="fa-solid fa-briefcase"></i>
+          </a>
+          <div class="min-w-0">
+            <div class="text-sm font-semibold leading-4">岗位推荐</div>
+            <div class="text-xs text-slate-500">用户画像 + 简历 → 推荐岗位（可选目标岗位）</div>
+          </div>
+        </div>
+
+        <nav class="hidden items-center gap-2 sm:flex">
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="resume.html">简历诊断</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="gap.html">能力差距</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="interview.html">模拟面试</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <section class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-compass"></i><span>推荐列表</span>
+              </div>
+              <h1 class="mt-3 text-xl font-extrabold">为你推荐的岗位方向</h1>
+              <p class="mt-1 text-sm text-slate-600">MVP：前端根据简历关键词生成候选岗位与匹配理由。</p>
+            </div>
+            <button id="btnGenerate" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800" type="button">
+              <i class="fa-solid fa-rotate mr-2"></i>重新生成
+            </button>
+          </div>
+
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="text-xs font-semibold text-slate-500">用户画像（可编辑）</div>
+              <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                <div>
+                  <label class="text-xs font-semibold text-slate-600" for="level">经验</label>
+                  <select
+                    id="level"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-slate-900/10 focus:ring-4"
+                  >
+                    <option value="0-1">0-1 年</option>
+                    <option value="1-3" selected>1-3 年</option>
+                    <option value="3-5">3-5 年</option>
+                    <option value="5+">5 年以上</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-600" for="city">城市</label>
+                  <input
+                    id="city"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-slate-900/10 focus:ring-4"
+                    placeholder="例如：上海 / 深圳 / 远程"
+                    value="上海"
+                  />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-xs font-semibold text-slate-600" for="pref">偏好</label>
+                  <input
+                    id="pref"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none ring-slate-900/10 focus:ring-4"
+                    placeholder="例如：B 端 / SaaS / 性能优化 / 组件库"
+                    value="B 端 SaaS、工程化、性能优化"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="text-xs font-semibold text-slate-500">输入摘要</div>
+              <div class="mt-2 space-y-2">
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                  <div class="text-xs font-semibold text-slate-500">简历</div>
+                  <div id="resumeMeta" class="mt-1 line-clamp-3 text-sm text-slate-800">未填写</div>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                  <div class="text-xs font-semibold text-slate-500">岗位描述（用于后续差距/面试）</div>
+                  <div id="jdMeta" class="mt-1 line-clamp-3 text-sm text-slate-800">未填写</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <i class="fa-regular fa-circle-info"></i>
+                  <span>建议先在 `resume.html` 填写 JD 与简历，以提升后续模块演示效果。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <div class="mb-3 flex items-center justify-between">
+              <div class="text-sm font-extrabold">推荐岗位</div>
+              <div class="text-xs text-slate-500">点击卡片选择一个目标岗位</div>
+            </div>
+            <div id="jobsWrap" class="grid gap-4 md:grid-cols-2"></div>
+          </div>
+        </div>
+
+        <aside class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
+                <i class="fa-solid fa-bullseye"></i><span>目标岗位</span>
+              </div>
+              <h2 class="mt-3 text-xl font-extrabold">选择后进入核心分析</h2>
+              <p class="mt-1 text-sm text-slate-600">你选中的岗位将用于「能力差距」与「模拟面试」的生成。</p>
+            </div>
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50">
+              <i class="fa-solid fa-fire text-slate-900"></i>
+            </div>
+          </div>
+
+          <div id="chosenCard" class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6">
+            <div class="text-sm font-semibold text-slate-800">尚未选择</div>
+            <div class="mt-1 text-sm text-slate-600">点击左侧任意岗位卡片以设为目标。</div>
+          </div>
+
+          <div class="mt-4 grid gap-2">
+            <a
+              id="btnToGap"
+              href="gap.html"
+              class="pointer-events-none inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white/60"
+              aria-disabled="true"
+            >
+              去能力差距分析<i class="fa-solid fa-arrow-right ml-2"></i>
+            </a>
+            <a
+              id="btnToInterview"
+              href="interview.html"
+              class="pointer-events-none inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-400"
+              aria-disabled="true"
+            >
+              去 AI 模拟面试
+            </a>
+            <a href="resume.html" class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-pen-to-square mr-2"></i>返回补充输入
+            </a>
+          </div>
+
+          <div class="mt-6 overflow-hidden rounded-3xl border border-slate-200">
+            <img
+              alt="Unsplash office"
+              class="h-40 w-full object-cover"
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
+            />
+            <div class="bg-white p-4">
+              <div class="text-sm font-extrabold">建议使用方式</div>
+              <ul class="mt-2 space-y-2 text-sm text-slate-600">
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>先做简历诊断，补齐关键信息</span></li>
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>在此页选择目标岗位方向</span></li>
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>进入差距分析与模拟面试</span></li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-600">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-regular fa-circle-check"></i>
+            <span>原型提示：推荐算法在此页为前端规则模拟，后续可替换为后端/LLM。</span>
+          </div>
+          <a class="font-semibold hover:text-slate-900" href="index.html">返回首页</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const StorageKeys = {
+        jd: "jia.jd",
+        resume: "jia.resume",
+        persona: "jia.persona",
+        chosenJob: "jia.chosenJob",
+      };
+
+      function shortText(s, maxLen) {
+        const v = (s || "").trim();
+        if (!v) return "未填写";
+        if (v.length <= maxLen) return v;
+        return v.slice(0, maxLen) + "…";
+      }
+
+      function extractSignals(resume) {
+        const text = (resume || "").toLowerCase();
+        const hasReact = /react/.test(text);
+        const hasTS = /typescript|\bts\b/.test(text);
+        const hasNode = /node/.test(text);
+        const hasPerf = /(性能|performance|首屏|lcp|tti|懒加载|分包|缓存)/.test(text);
+        const hasRBAC = /(权限|rbac|acl)/.test(text);
+        const hasData = /(埋点|日志|监控|可观测|observability)/.test(text);
+        const hasAntd = /(antd|ant design)/.test(text);
+        const hasTailwind = /tailwind/.test(text);
+        return { hasReact, hasTS, hasNode, hasPerf, hasRBAC, hasData, hasAntd, hasTailwind };
+      }
+
+      function buildJobs(persona, resume, jd) {
+        const s = extractSignals(resume);
+        const baseCity = (persona.city || "上海").trim();
+        const level = persona.level || "1-3";
+
+        const list = [];
+        list.push({
+          id: "fe-saas",
+          title: "前端工程师（B 端 SaaS）",
+          city: baseCity,
+          salary: level === "0-1" ? "12-18k" : level === "1-3" ? "18-28k" : level === "3-5" ? "28-45k" : "45k+",
+          match: Math.min(92, 78 + (s.hasReact ? 6 : 0) + (s.hasTS ? 6 : 0) + (s.hasRBAC ? 4 : 0) + (s.hasPerf ? 4 : 0)),
+          reasons: [
+            "与你的项目经历（复杂表单/业务流程）匹配",
+            s.hasRBAC ? "简历包含权限/RBAC 经验" : "建议补充权限/角色模型的落地经验",
+            s.hasPerf ? "有性能优化意识（可转化为指标型成果）" : "建议补充性能优化案例与指标",
+          ],
+          must: ["React", "TypeScript", "复杂表单", "权限/多租户"],
+          nice: ["组件库建设", "性能指标（LCP/CLS）", "可观测"],
+        });
+
+        list.push({
+          id: "fe-platform",
+          title: "前端工程师（平台/中台）",
+          city: baseCity,
+          salary: level === "0-1" ? "13-19k" : level === "1-3" ? "20-30k" : level === "3-5" ? "30-48k" : "48k+",
+          match: Math.min(90, 72 + (s.hasRBAC ? 8 : 0) + (s.hasAntd || s.hasTailwind ? 4 : 0) + (s.hasTS ? 5 : 0)),
+          reasons: [
+            "强调权限、配置化与复用能力",
+            s.hasAntd || s.hasTailwind ? "有组件库/样式体系经验" : "建议补充组件抽象与规范",
+            "适合沉淀通用表单、流程编排与可配置能力",
+          ],
+          must: ["权限模型", "组件抽象", "工程化"],
+          nice: ["低代码", "流程引擎", "可配置表单"],
+        });
+
+        list.push({
+          id: "fe-performance",
+          title: "前端工程师（性能&体验）",
+          city: baseCity,
+          salary: level === "0-1" ? "12-20k" : level === "1-3" ? "22-32k" : level === "3-5" ? "32-50k" : "50k+",
+          match: Math.min(88, 68 + (s.hasPerf ? 12 : 0) + (s.hasData ? 6 : 0) + (s.hasTS ? 4 : 0)),
+          reasons: [
+            s.hasPerf ? "已有性能优化案例基础，可深化到指标体系" : "建议补充性能指标与优化手段",
+            s.hasData ? "有监控/日志/埋点意识" : "建议补充可观测/监控指标链路",
+            "适合打造性能基线、构建性能预算与治理机制",
+          ],
+          must: ["性能指标", "工程化", "监控/埋点"],
+          nice: ["Web Vitals", "RUM", "Profiler"],
+        });
+
+        list.push({
+          id: "fe-fullstack-lite",
+          title: "前端工程师（全栈倾向）",
+          city: baseCity,
+          salary: level === "0-1" ? "12-18k" : level === "1-3" ? "18-30k" : level === "3-5" ? "30-46k" : "46k+",
+          match: Math.min(86, 66 + (s.hasNode ? 10 : 0) + (s.hasTS ? 4 : 0) + (s.hasReact ? 4 : 0)),
+          reasons: [
+            s.hasNode ? "简历包含 Node 能力，可承接 BFF/工具链" : "建议补充 Node/BFF、接口聚合与鉴权经验",
+            "适合快速迭代业务、降低前后端沟通成本",
+            jd && jd.trim().length > 20 ? "可将 JD 要求映射到端到端交付能力" : "建议补齐 JD，以提高后续模块演示",
+          ],
+          must: ["React", "TypeScript", "Node（BFF）"],
+          nice: ["鉴权", "缓存", "接口聚合"],
+        });
+
+        return list.sort((a, b) => b.match - a.match);
+      }
+
+      function savePersona() {
+        const persona = {
+          level: document.getElementById("level").value,
+          city: document.getElementById("city").value,
+          pref: document.getElementById("pref").value,
+        };
+        localStorage.setItem(StorageKeys.persona, JSON.stringify(persona));
+        return persona;
+      }
+
+      function loadPersona() {
+        const raw = localStorage.getItem(StorageKeys.persona);
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      function setChosen(job) {
+        localStorage.setItem(StorageKeys.chosenJob, JSON.stringify(job));
+        const wrap = document.getElementById("chosenCard");
+        wrap.className = "mt-6 rounded-3xl border border-slate-200 bg-white p-5";
+        wrap.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-slate-500">已选择目标岗位</div>
+              <div class="mt-1 text-lg font-extrabold">${job.title}</div>
+              <div class="mt-1 text-sm text-slate-600">${job.city} · ${job.salary} · 匹配度 <span class="font-semibold text-slate-900">${job.match}%</span></div>
+            </div>
+            <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900"><i class="fa-solid fa-bullseye mr-1"></i>目标</span>
+          </div>
+          <div class="mt-4 grid gap-2 sm:grid-cols-2">
+            <div class="rounded-2xl bg-slate-50 p-3">
+              <div class="text-xs font-semibold text-slate-500">必备</div>
+              <div class="mt-1 text-sm font-semibold text-slate-900">${job.must.slice(0, 3).join(" / ")}</div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 p-3">
+              <div class="text-xs font-semibold text-slate-500">加分</div>
+              <div class="mt-1 text-sm font-semibold text-slate-900">${job.nice.slice(0, 3).join(" / ")}</div>
+            </div>
+          </div>
+        `;
+
+        const btnGap = document.getElementById("btnToGap");
+        const btnInterview = document.getElementById("btnToInterview");
+
+        btnGap.classList.remove("pointer-events-none", "text-white/60");
+        btnGap.classList.add("hover:bg-slate-800");
+        btnGap.removeAttribute("aria-disabled");
+
+        btnInterview.classList.remove("pointer-events-none", "text-slate-400");
+        btnInterview.classList.add("text-slate-900", "hover:bg-slate-50");
+        btnInterview.removeAttribute("aria-disabled");
+      }
+
+      function renderJobs(list) {
+        const wrap = document.getElementById("jobsWrap");
+        wrap.innerHTML = "";
+        for (const job of list) {
+          const el = document.createElement("button");
+          el.type = "button";
+          el.className =
+            "text-left rounded-3xl border border-slate-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-slate-900/10";
+          el.innerHTML = `
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-lg font-extrabold">${job.title}</div>
+                <div class="mt-1 text-sm text-slate-600">${job.city} · ${job.salary}</div>
+              </div>
+              <div class="shrink-0 rounded-2xl bg-slate-900 px-3 py-2 text-sm font-extrabold text-white">${job.match}%</div>
+            </div>
+            <div class="mt-4 grid gap-2 sm:grid-cols-2">
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">匹配理由</div>
+                <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                  ${job.reasons
+                    .slice(0, 3)
+                    .map((r) => `<li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>${r}</span></li>`)
+                    .join("")}
+                </ul>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">关键词</div>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  ${job.must
+                    .slice(0, 4)
+                    .map((t) => `<span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">${t}</span>`)
+                    .join("")}
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-sm">
+              <div class="text-slate-600">点击设为目标岗位 → 用于差距分析/模拟面试</div>
+              <div class="font-semibold text-slate-900">选择<i class="fa-solid fa-arrow-right ml-2"></i></div>
+            </div>
+          `;
+          el.addEventListener("click", () => setChosen(job));
+          wrap.appendChild(el);
+        }
+      }
+
+      function renderMeta() {
+        const resume = localStorage.getItem(StorageKeys.resume) || "";
+        const jd = localStorage.getItem(StorageKeys.jd) || "";
+        document.getElementById("resumeMeta").textContent = shortText(resume, 90);
+        document.getElementById("jdMeta").textContent = shortText(jd, 90);
+      }
+
+      function regenerate() {
+        const persona = savePersona();
+        const resume = localStorage.getItem(StorageKeys.resume) || "";
+        const jd = localStorage.getItem(StorageKeys.jd) || "";
+        const list = buildJobs(persona, resume, jd);
+        renderJobs(list);
+      }
+
+      const persisted = loadPersona();
+      if (persisted) {
+        document.getElementById("level").value = persisted.level || "1-3";
+        document.getElementById("city").value = persisted.city || "上海";
+        document.getElementById("pref").value = persisted.pref || "B 端 SaaS、工程化、性能优化";
+      }
+
+      renderMeta();
+      regenerate();
+
+      document.getElementById("btnGenerate").addEventListener("click", regenerate);
+      document.getElementById("level").addEventListener("change", regenerate);
+      document.getElementById("city").addEventListener("input", () => {
+        savePersona();
+      });
+      document.getElementById("pref").addEventListener("input", () => {
+        savePersona();
+      });
+
+      const chosenRaw = localStorage.getItem(StorageKeys.chosenJob);
+      if (chosenRaw) {
+        try {
+          setChosen(JSON.parse(chosenRaw));
+        } catch {}
+      }
+    </script>
+  </body>
+</html>
+

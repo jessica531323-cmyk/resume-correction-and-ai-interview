@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>求职面试助手 | Web MVP 原型</title>
+    <meta name="description" content="求职面试助手 Web 端原型：简历诊断、岗位推荐、能力差距分析、AI 模拟面试。" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: {
+              soft: "0 10px 30px rgba(2, 6, 23, 0.10)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <div class="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-soft">
+            <i class="fa-solid fa-briefcase"></i>
+          </div>
+          <div>
+            <div class="text-sm font-semibold leading-4">求职面试助手</div>
+            <div class="text-xs text-slate-500">Web MVP 前端原型（SaaS 风格）</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="btnQuickStart"
+            class="hidden rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 sm:inline-flex"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>一键填充示例
+          </button>
+          <a
+            href="resume.html"
+            class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50"
+          >
+            开始使用<i class="fa-solid fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-10">
+      <section class="grid gap-8 lg:grid-cols-2">
+        <div class="space-y-5">
+          <div class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
+            <i class="fa-solid fa-bolt"></i>
+            <span>从简历到面试的一站式闭环</span>
+          </div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            把「简历」变成「offer 概率」的可执行路径
+          </h1>
+          <p class="text-base leading-7 text-slate-600">
+            上传/粘贴简历与岗位描述，快速得到问题点、修改建议、岗位推荐、能力差距与模拟面试题库。用于 MVP 验证与后续开发对齐。
+          </p>
+
+          <div class="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-semibold">你的输入信息（可选）</div>
+              <button
+                id="btnClear"
+                class="rounded-lg px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                type="button"
+              >
+                <i class="fa-regular fa-trash-can mr-1"></i>清空
+              </button>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">岗位描述</div>
+                <div id="metaJD" class="mt-1 line-clamp-3 text-sm text-slate-800">未填写</div>
+              </div>
+              <div class="rounded-xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">简历</div>
+                <div id="metaResume" class="mt-1 line-clamp-3 text-sm text-slate-800">未填写</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <a
+                href="resume.html"
+                class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                <i class="fa-solid fa-file-pen mr-2"></i>进入简历诊断
+              </a>
+              <a
+                href="jobs.html"
+                class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+              >
+                <i class="fa-solid fa-compass mr-2"></i>查看岗位推荐
+              </a>
+            </div>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <div class="text-xs font-semibold text-slate-500">预计体验时长</div>
+              <div class="mt-1 text-2xl font-extrabold">3–5 分钟</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <div class="text-xs font-semibold text-slate-500">核心产出</div>
+              <div class="mt-1 text-2xl font-extrabold">差距清单</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <div class="text-xs font-semibold text-slate-500">面试准备</div>
+              <div class="mt-1 text-2xl font-extrabold">题库策略</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+          <img
+            class="h-72 w-full object-cover"
+            alt="Unsplash hero"
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-white via-white/70 to-transparent"></div>
+          <div class="relative p-6">
+            <div class="mb-4 flex items-center justify-between">
+              <div class="text-sm font-semibold">用户路径（MVP）</div>
+              <span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">闭环</span>
+            </div>
+            <ol class="space-y-3">
+              <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <div class="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-900">
+                  <i class="fa-solid fa-upload"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold">上传简历 / 粘贴岗位描述</div>
+                  <div class="text-sm text-slate-600">统一收集输入，便于跨模块复用。</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <div class="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-900">
+                  <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold">简历诊断</div>
+                  <div class="text-sm text-slate-600">表达 / 结构 / 数据缺失 → 修改建议。</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <div class="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-slate-900">
+                  <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold">岗位推荐</div>
+                  <div class="text-sm text-slate-600">用户画像 + 简历 → 候选岗位清单。</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <div class="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-amber-100 text-amber-900">
+                  <i class="fa-solid fa-fire"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold">能力差距分析（核心）</div>
+                  <div class="text-sm text-slate-600">缺失技能 + 补充项目建议，明确下一步。</div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <div class="mt-0.5 grid h-8 w-8 place-items-center rounded-xl bg-amber-100 text-amber-900">
+                  <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold">AI 模拟面试（核心）</div>
+                  <div class="text-sm text-slate-600">项目深挖 + 行为面试问题 + 追问链路。</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-10">
+        <div class="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-extrabold">功能模块</h2>
+            <p class="mt-1 text-sm text-slate-600">每行 2 个卡片，点击进入对应页面。</p>
+          </div>
+          <div class="hidden items-center gap-2 text-sm text-slate-600 sm:flex">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>此原型使用本地存储保存输入</span>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <a
+            href="resume.html"
+            class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  <i class="fa-solid fa-file-pen"></i>
+                  <span>入口</span>
+                </div>
+                <div class="mt-3 text-lg font-extrabold">简历诊断</div>
+                <div class="mt-1 text-sm text-slate-600">输入：岗位描述 + 简历；输出：问题点与修改建议。</div>
+              </div>
+              <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-white">
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+            <div class="mt-5 grid gap-2 sm:grid-cols-3">
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">表达</div>
+                <div class="mt-1 text-sm font-semibold">精准可读</div>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">结构</div>
+                <div class="mt-1 text-sm font-semibold">一眼定位</div>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">数据</div>
+                <div class="mt-1 text-sm font-semibold">量化成果</div>
+              </div>
+            </div>
+          </a>
+
+          <a
+            href="jobs.html"
+            class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  <i class="fa-solid fa-compass"></i>
+                  <span>方向</span>
+                </div>
+                <div class="mt-3 text-lg font-extrabold">岗位推荐</div>
+                <div class="mt-1 text-sm text-slate-600">用户画像 + 简历 → 推荐岗位列表与匹配理由。</div>
+              </div>
+              <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-white">
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+            <div class="mt-5 flex flex-wrap gap-2">
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">匹配度</span>
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">关键技能</span>
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">薪资区间</span>
+              <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">成长性</span>
+            </div>
+          </a>
+
+          <a
+            href="gap.html"
+            class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
+                  <i class="fa-solid fa-fire"></i>
+                  <span>核心</span>
+                </div>
+                <div class="mt-3 text-lg font-extrabold">能力差距分析</div>
+                <div class="mt-1 text-sm text-slate-600">输入：岗位 + 简历；输出：缺失技能与项目补充建议。</div>
+              </div>
+              <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-white">
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+            <div class="mt-5 grid gap-2 sm:grid-cols-2">
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">缺失技能</div>
+                <div class="mt-1 text-sm font-semibold">可执行清单</div>
+              </div>
+              <div class="rounded-2xl bg-slate-50 p-3">
+                <div class="text-xs font-semibold text-slate-500">补充项目</div>
+                <div class="mt-1 text-sm font-semibold">可写入简历</div>
+              </div>
+            </div>
+          </a>
+
+          <a
+            href="interview.html"
+            class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
+                  <i class="fa-solid fa-fire"></i>
+                  <span>核心</span>
+                </div>
+                <div class="mt-3 text-lg font-extrabold">AI 模拟面试</div>
+                <div class="mt-1 text-sm text-slate-600">基于岗位 + 简历生成深挖问题与行为面试题。</div>
+              </div>
+              <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-white">
+                <i class="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+            <div class="mt-5 flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+              <div class="text-sm">
+                <div class="font-semibold">包含追问链路</div>
+                <div class="text-slate-600">从回答到追问，模拟真实面试节奏。</div>
+              </div>
+              <div class="grid h-10 w-10 place-items-center rounded-xl bg-white text-slate-900">
+                <i class="fa-solid fa-layer-group"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-regular fa-circle-check"></i>
+          <span>原型提示：所有“分析结果”为前端演示数据，可用于对齐信息结构与交互。</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <a class="hover:text-slate-900" href="resume.html">简历诊断</a>
+          <a class="hover:text-slate-900" href="jobs.html">岗位推荐</a>
+          <a class="hover:text-slate-900" href="gap.html">能力差距</a>
+          <a class="hover:text-slate-900" href="interview.html">模拟面试</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const StorageKeys = {
+        jd: "jia.jd",
+        resume: "jia.resume",
+      };
+
+      function shortText(s, maxLen) {
+        const v = (s || "").trim();
+        if (!v) return "未填写";
+        if (v.length <= maxLen) return v;
+        return v.slice(0, maxLen) + "…";
+      }
+
+      function renderMeta() {
+        const jd = localStorage.getItem(StorageKeys.jd) || "";
+        const resume = localStorage.getItem(StorageKeys.resume) || "";
+        document.getElementById("metaJD").textContent = shortText(jd, 80);
+        document.getElementById("metaResume").textContent = shortText(resume, 80);
+        document.getElementById("btnQuickStart").classList.remove("hidden");
+      }
+
+      function setQuickSample() {
+        const sampleJD =
+          "岗位：前端工程师（SaaS）\n职责：负责 B 端产品前端架构与组件建设；推动性能优化；与产品/后端协作交付。\n要求：React/TypeScript；Tailwind 或组件库；了解性能优化、可观测；有复杂表单/权限/多租户经验优先。";
+        const sampleResume =
+          "候选人：Daisy\n目标：前端工程师（B 端）\n\n项目：CRM 销售管理平台\n- 使用 React + TS + AntD 开发 20+ 页面，包含线索、商机、报价、合同等模块\n- 搭建通用表单与权限控制，减少重复开发\n- 性能优化：首屏从 3.2s 优化到 1.9s（懒加载 + 分包 + 缓存）\n\n技能：React / TypeScript / JavaScript / Node.js / Webpack / Git\n教育：本科";
+        localStorage.setItem(StorageKeys.jd, sampleJD);
+        localStorage.setItem(StorageKeys.resume, sampleResume);
+        renderMeta();
+      }
+
+      document.getElementById("btnQuickStart").addEventListener("click", () => {
+        setQuickSample();
+      });
+
+      document.getElementById("btnClear").addEventListener("click", () => {
+        localStorage.removeItem(StorageKeys.jd);
+        localStorage.removeItem(StorageKeys.resume);
+        renderMeta();
+      });
+
+      renderMeta();
+    </script>
+  </body>
+</html>
+
