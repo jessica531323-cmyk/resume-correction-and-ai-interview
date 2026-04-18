@@ -37,8 +37,15 @@ function requireApiKey(req, res) {
   return true;
 }
 
-const cfg = getLLMConfig();
-const openai = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL });
+// 延迟初始化 OpenAI 客户端（确保环境变量已加载）
+let openai = null;
+function getOpenAI() {
+  if (!openai) {
+    const cfg = getLLMConfig();
+    openai = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL });
+  }
+  return openai;
+}
 
 function safeJsonParse(text) {
   try {
@@ -97,7 +104,7 @@ Hard requirements:
   const user = `Job Description (JD):\n${jd}\n\nResume:\n${resume}`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model,
       temperature: 0.2,
       messages: [
@@ -157,7 +164,7 @@ Rules:
   const user = `Persona: ${JSON.stringify(persona)}\nResume: ${resume || ''}\nJD: ${jd || ''}`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model,
       temperature: 0.3,
       messages: [
@@ -208,7 +215,7 @@ Rules:
   const user = `Target Job: ${JSON.stringify(target_job)}\nJD: ${jd || ''}\nResume: ${resume || ''}`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model,
       temperature: 0.3,
       messages: [
@@ -260,7 +267,7 @@ Rules:
   const user = `Target Job: ${JSON.stringify(target_job)}\nJD: ${jd || ''}\nResume: ${resume || ''}`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model,
       temperature: 0.3,
       messages: [
