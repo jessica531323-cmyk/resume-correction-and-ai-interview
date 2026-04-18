@@ -1,0 +1,10 @@
+{
+  "name": "job-interview-api",
+  "version": "1.0.0",
+  "description": "CloudBase function for job interview assistant",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "openai": "^4.60.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "envId": "你的环境ID",
+  "functionRoot": "functions",
+  "functions": [
+    {
+      "name": "api",
+      "timeout": 60,
+      "envVariables": {
+        "LLM_API_KEY": "你的API密钥",
+        "LLM_BASE_URL": "https://ark.cn-beijing.volces.com/api/v3",
+        "LLM_MODEL": "deepseek-v3-2-251201"
+      }
+    }
+  ],
+  "hosting": {
+    "public": "./",
+    "ignore": [
+      "node_modules",
+      "functions",
+      ".git",
+      ".env",
+      "__pycache__",
+      ".qoder",
+      "server",
+      "api"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/*",
+        "function": "api"
+      }
+    ]
+  }
+}
