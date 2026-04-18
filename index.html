@@ -40,12 +40,6 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button
-            id="btnQuickStart"
-            class="hidden rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 sm:inline-flex"
-          >
-            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>一键填充示例
-          </button>
           <a
             href="resume.html"
             class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50"
@@ -67,7 +61,7 @@
             把「简历」变成「offer 概率」的可执行路径
           </h1>
           <p class="text-base leading-7 text-slate-600">
-            上传/粘贴简历与岗位描述，快速得到问题点、修改建议、岗位推荐、能力差距与模拟面试题库。用于 MVP 验证与后续开发对齐。
+            上传/粘贴简历与岗位描述，快速得到问题点、修改建议、岗位推荐、能力差距与模拟面试题库。
           </p>
 
           <div class="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
@@ -350,22 +344,7 @@
         const resume = localStorage.getItem(StorageKeys.resume) || "";
         document.getElementById("metaJD").textContent = shortText(jd, 80);
         document.getElementById("metaResume").textContent = shortText(resume, 80);
-        document.getElementById("btnQuickStart").classList.remove("hidden");
       }
-
-      function setQuickSample() {
-        const sampleJD =
-          "岗位：前端工程师（SaaS）\n职责：负责 B 端产品前端架构与组件建设；推动性能优化；与产品/后端协作交付。\n要求：React/TypeScript；Tailwind 或组件库；了解性能优化、可观测；有复杂表单/权限/多租户经验优先。";
-        const sampleResume =
-          "候选人：Daisy\n目标：前端工程师（B 端）\n\n项目：CRM 销售管理平台\n- 使用 React + TS + AntD 开发 20+ 页面，包含线索、商机、报价、合同等模块\n- 搭建通用表单与权限控制，减少重复开发\n- 性能优化：首屏从 3.2s 优化到 1.9s（懒加载 + 分包 + 缓存）\n\n技能：React / TypeScript / JavaScript / Node.js / Webpack / Git\n教育：本科";
-        localStorage.setItem(StorageKeys.jd, sampleJD);
-        localStorage.setItem(StorageKeys.resume, sampleResume);
-        renderMeta();
-      }
-
-      document.getElementById("btnQuickStart").addEventListener("click", () => {
-        setQuickSample();
-      });
 
       document.getElementById("btnClear").addEventListener("click", () => {
         localStorage.removeItem(StorageKeys.jd);

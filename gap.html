@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>能力差距分析 | 求职面试助手</title>
+    <meta name="description" content="基于目标岗位 + JD + 简历输出缺失技能、补充项目与行动计划（无示例，AI 驱动）。" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: { soft: "0 10px 30px rgba(2, 6, 23, 0.10)" },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-soft">
+            <i class="fa-solid fa-briefcase"></i>
+          </a>
+          <div class="min-w-0">
+            <div class="text-sm font-semibold leading-4">能力差距分析</div>
+            <div class="text-xs text-slate-500">目标岗位 + JD + 简历 → 缺失技能 & 补充项目（AI 驱动）</div>
+          </div>
+        </div>
+
+        <nav class="hidden items-center gap-2 sm:flex">
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="resume.html">简历诊断</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="jobs.html">岗位推荐</a>
+          <a class="rounded-xl px-3 py-2 text-sm font-semibold hover:bg-slate-100" href="interview.html">模拟面试</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <section class="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
+                <i class="fa-solid fa-fire"></i><span>核心模块</span>
+              </div>
+              <h1 class="mt-3 text-xl font-extrabold">生成你的差距清单</h1>
+              <p class="mt-1 text-sm text-slate-600">不展示任何示例结果。请先在前序页面补齐输入与目标岗位。</p>
+            </div>
+            <button
+              id="btnGenerate"
+              class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              disabled
+            >
+              <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>生成差距分析
+            </button>
+          </div>
+
+          <div class="mt-5 space-y-3">
+            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+              <span id="aiBadge" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-robot"></i><span>AI：检测中…</span>
+              </span>
+              <a id="aiHelp" href="#" class="text-xs font-semibold text-slate-600 hover:text-slate-900">如何启用？</a>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-4">
+              <div class="text-xs font-semibold text-slate-500">当前输入摘要</div>
+              <div class="mt-2 grid gap-2">
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                  <div class="text-xs font-semibold text-slate-500">目标岗位</div>
+                  <div id="jobMeta" class="mt-1 text-sm font-semibold text-slate-900">未选择</div>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                  <div class="text-xs font-semibold text-slate-500">岗位描述（JD）</div>
+                  <div id="jdMeta" class="mt-1 line-clamp-2 text-sm text-slate-800">未填写</div>
+                </div>
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                  <div class="text-xs font-semibold text-slate-500">简历</div>
+                  <div id="resumeMeta" class="mt-1 line-clamp-2 text-sm text-slate-800">未填写</div>
+                </div>
+              </div>
+              <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                <a href="jobs.html" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50">
+                  去选择目标岗位<i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+                <a href="resume.html" class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                  去补齐 JD/简历
+                </a>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+              <div class="text-sm font-extrabold">输出说明</div>
+              <ul class="mt-2 space-y-2 text-sm text-slate-600">
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>缺失技能（按 P0/P1/P2 排序）</span></li>
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>可落简历的补充项目建议（含指标与 bullet）</span></li>
+                <li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>7 天行动计划与导出 Markdown</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-list-check"></i><span>输出区</span>
+              </div>
+              <h2 class="mt-3 text-xl font-extrabold">分析结果</h2>
+              <p class="mt-1 text-sm text-slate-600">生成后将展示差距清单、项目建议与可导出内容。</p>
+            </div>
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50">
+              <i class="fa-solid fa-layer-group text-slate-900"></i>
+            </div>
+          </div>
+
+          <div id="emptyState" class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white">
+              <i class="fa-regular fa-chart-bar text-slate-900"></i>
+            </div>
+            <div class="mt-3 text-sm font-semibold">还没有分析结果</div>
+            <div class="mt-1 text-sm text-slate-600">点击左侧「生成差距分析」。</div>
+          </div>
+
+          <div id="progressCard" class="mt-6 hidden overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <div class="p-5">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold">生成进度</div>
+                  <div id="progressText" class="mt-1 text-sm text-slate-600">准备中…</div>
+                </div>
+                <div class="grid h-10 w-10 place-items-center rounded-2xl bg-slate-50">
+                  <i class="fa-solid fa-spinner animate-spin text-slate-900"></i>
+                </div>
+              </div>
+            </div>
+            <div class="h-2 bg-slate-200">
+              <div id="progressBar" class="h-2 w-0 bg-slate-900 transition-[width]"></div>
+            </div>
+          </div>
+
+          <div id="result" class="mt-6 hidden space-y-4">
+            <div class="rounded-3xl bg-white border border-slate-200 p-5">
+              <div class="text-sm font-extrabold">结论摘要</div>
+              <div id="summary" class="mt-2 text-sm text-slate-700">-</div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold">缺失技能（按优先级）</div>
+                <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">P0 优先</span>
+              </div>
+              <ol id="missing" class="mt-4 space-y-3 list-decimal pl-5"></ol>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold">补充项目建议（可写入简历）</div>
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">含指标&bullet</span>
+              </div>
+              <div id="projects" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex items-center justify-between">
+                <div class="text-sm font-extrabold">7 天行动计划</div>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">可执行</span>
+              </div>
+              <ol id="plan" class="mt-4 space-y-3 list-decimal pl-5"></ol>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold">导出内容（Markdown）</div>
+                  <div class="mt-1 text-sm text-slate-600">可直接复制或导出文件。</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button id="btnCopy" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50" type="button">
+                    <i class="fa-regular fa-copy mr-2"></i>复制
+                  </button>
+                  <button id="btnExport" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800" type="button">
+                    <i class="fa-solid fa-download mr-2"></i>导出 .md
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="export"
+                class="mt-4 h-64 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
+                placeholder="生成后会在这里提供可导出的 Markdown…"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-600">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i class="fa-regular fa-circle-check"></i>
+            <span>提示：差距分析由 AI 生成（未启用 AI 时不展示）。</span>
+          </div>
+          <a class="font-semibold hover:text-slate-900" href="index.html">返回首页</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const StorageKeys = {
+        jd: "jia.jd",
+        resume: "jia.resume",
+        chosenJob: "jia.chosenJob",
+        lastGap: "jia.lastGap",
+      };
+
+      const elAiBadge = document.getElementById("aiBadge");
+      const elAiHelp = document.getElementById("aiHelp");
+      const btnGenerate = document.getElementById("btnGenerate");
+
+      function shortText(s, maxLen) {
+        const v = (s || "").trim();
+        if (!v) return "未填写";
+        if (v.length <= maxLen) return v;
+        return v.slice(0, maxLen) + "…";
+      }
+
+      function setAiBadge(state, detail = "") {
+        const map = {
+          checking: { cls: "bg-slate-100 text-slate-700", text: "AI：检测中…" },
+          on: { cls: "bg-emerald-100 text-emerald-900", text: "AI：已启用" },
+          off: { cls: "bg-amber-100 text-amber-900", text: "AI：未启用" },
+          error: { cls: "bg-rose-100 text-rose-900", text: "AI：不可用" },
+        };
+        const v = map[state] || map.checking;
+        elAiBadge.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${v.cls}`;
+        elAiBadge.innerHTML = `<i class="fa-solid fa-robot"></i><span>${v.text}${detail ? " · " + detail : ""}</span>`;
+      }
+
+      async function checkAiHealth() {
+        setAiBadge("checking");
+        try {
+          const r = await fetch("/api/health", { cache: "no-store" });
+          if (!r.ok) throw new Error("health not ok");
+          const j = await r.json();
+          if (j && j.ok && j.hasOpenAIKey) {
+            setAiBadge("on");
+            btnGenerate.disabled = false;
+          } else {
+            setAiBadge("off", "缺少 Key");
+            btnGenerate.disabled = true;
+          }
+        } catch {
+          setAiBadge("off", "未运行服务");
+          btnGenerate.disabled = true;
+        }
+      }
+
+      function setProgress(pct, text) {
+        const card = document.getElementById("progressCard");
+        const bar = document.getElementById("progressBar");
+        const t = document.getElementById("progressText");
+        card.classList.remove("hidden");
+        bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        t.textContent = text || "进行中…";
+      }
+
+      function hideProgress() {
+        document.getElementById("progressCard").classList.add("hidden");
+        document.getElementById("progressBar").style.width = "0%";
+      }
+
+      function exportText(filename, text) {
+        const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function copyText(text) {
+        const t = (text || "").trim();
+        if (!t) return;
+        try {
+          await navigator.clipboard.writeText(t);
+        } catch {}
+      }
+
+      function renderMeta() {
+        const resume = localStorage.getItem(StorageKeys.resume) || "";
+        const jd = localStorage.getItem(StorageKeys.jd) || "";
+        document.getElementById("resumeMeta").textContent = shortText(resume, 90);
+        document.getElementById("jdMeta").textContent = shortText(jd, 90);
+        const chosenRaw = localStorage.getItem(StorageKeys.chosenJob);
+        if (chosenRaw) {
+          try {
+            const job = JSON.parse(chosenRaw);
+            document.getElementById("jobMeta").textContent = job?.title ? job.title : "已选择（未命名）";
+          } catch {
+            document.getElementById("jobMeta").textContent = "未选择";
+          }
+        } else {
+          document.getElementById("jobMeta").textContent = "未选择";
+        }
+      }
+
+      function renderResult(data) {
+        document.getElementById("emptyState").classList.add("hidden");
+        document.getElementById("result").classList.remove("hidden");
+
+        document.getElementById("summary").textContent = data.summary || "-";
+
+        const missing = document.getElementById("missing");
+        missing.innerHTML = "";
+        (data.missing_skills || []).forEach((m) => {
+          const li = document.createElement("li");
+          li.className = "rounded-2xl border border-slate-200 bg-white p-4";
+          const p = m.priority || "P1";
+          const pillCls = p === "P0" ? "bg-rose-100 text-rose-900" : p === "P1" ? "bg-amber-100 text-amber-900" : "bg-slate-100 text-slate-900";
+          li.innerHTML = `
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-extrabold">${m.skill || "-"}</div>
+                <div class="mt-1 text-sm text-slate-600">${m.why || ""}</div>
+                ${m.evidence_gap ? `<div class="mt-2 text-sm text-slate-700"><span class="font-semibold text-slate-900">差距证据：</span>${m.evidence_gap}</div>` : ""}
+                ${(m.how_to_gain || []).length ? `<div class="mt-2 text-sm text-slate-700"><span class="font-semibold text-slate-900">怎么补：</span>${(m.how_to_gain || []).slice(0, 3).join("；")}</div>` : ""}
+              </div>
+              <span class="rounded-full px-3 py-1 text-xs font-semibold ${pillCls}">${p}</span>
+            </div>
+          `;
+          missing.appendChild(li);
+        });
+
+        const projects = document.getElementById("projects");
+        projects.innerHTML = "";
+        (data.project_suggestions || []).forEach((p) => {
+          const el = document.createElement("div");
+          el.className = "rounded-2xl bg-slate-50 p-4";
+          el.innerHTML = `
+            <div class="text-sm font-extrabold">${p.title || "-"}</div>
+            <div class="mt-1 text-sm text-slate-600">${p.goal || ""}</div>
+            <div class="mt-3 grid gap-2 sm:grid-cols-2">
+              <div class="rounded-xl border border-slate-200 bg-white p-3">
+                <div class="text-xs font-semibold text-slate-500">范围</div>
+                <div class="mt-1 text-sm text-slate-800">${(p.scope || []).slice(0, 4).join(" / ") || "-"}</div>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-white p-3">
+                <div class="text-xs font-semibold text-slate-500">技术栈</div>
+                <div class="mt-1 text-sm text-slate-800">${(p.tech_stack || []).slice(0, 5).join(" / ") || "-"}</div>
+              </div>
+            </div>
+            <div class="mt-3 rounded-xl border border-slate-200 bg-white p-3">
+              <div class="text-xs font-semibold text-slate-500">指标（产品/运营逻辑）</div>
+              <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                ${(p.metrics || []).slice(0, 5).map((x) => `<li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>${x}</span></li>`).join("")}
+              </ul>
+            </div>
+            <div class="mt-3 rounded-xl border border-slate-200 bg-white p-3">
+              <div class="text-xs font-semibold text-slate-500">可直接写入简历的 bullet</div>
+              <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                ${(p.resume_bullets || []).slice(0, 5).map((x) => `<li class="flex gap-2"><i class="fa-solid fa-minus mt-1 text-slate-900"></i><span>${x}</span></li>`).join("")}
+              </ul>
+            </div>
+          `;
+          projects.appendChild(el);
+        });
+
+        const plan = document.getElementById("plan");
+        plan.innerHTML = "";
+        (data.learning_plan_14d || []).forEach((d) => {
+          const li = document.createElement("li");
+          li.className = "rounded-2xl border border-slate-200 bg-white p-4";
+          li.innerHTML = `
+            <div class="text-sm font-extrabold">Day ${d.day}: ${d.focus || "-"}</div>
+            <div class="mt-1 text-sm text-slate-600">${d.deliverable || ""}</div>
+          `;
+          plan.appendChild(li);
+        });
+
+        document.getElementById("export").value = (data.export_markdown || "").trim();
+      }
+
+      document.getElementById("btnCopy").addEventListener("click", async () => {
+        const t = document.getElementById("export").value || "";
+        if (!t.trim()) return;
+        await copyText(t);
+        alert("已复制");
+      });
+      document.getElementById("btnExport").addEventListener("click", () => {
+        const t = document.getElementById("export").value || "";
+        if (!t.trim()) return;
+        const ts = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const name = `gap-analysis-${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}.md`;
+        exportText(name, t + "\n");
+        alert("已导出");
+      });
+
+      btnGenerate.addEventListener("click", async () => {
+        if (!elAiBadge.textContent.includes("已启用")) return;
+        const resume = localStorage.getItem(StorageKeys.resume) || "";
+        const jd = localStorage.getItem(StorageKeys.jd) || "";
+        const chosenRaw = localStorage.getItem(StorageKeys.chosenJob);
+        const target_job = chosenRaw ? JSON.parse(chosenRaw) : {};
+        if ((resume || "").trim().length < 50) {
+          alert("请先在「简历诊断」页面填写/上传简历（至少 50 字）。");
+          return;
+        }
+        if ((jd || "").trim().length < 20 && !target_job) {
+          alert("请先补齐 JD（至少 20 字）或选择目标岗位。");
+          return;
+        }
+
+        document.getElementById("emptyState").classList.add("hidden");
+        document.getElementById("result").classList.add("hidden");
+        setProgress(12, "读取目标岗位与输入…");
+        const t1 = window.setTimeout(() => setProgress(40, "抽取差距与证据…"), 400);
+        const t2 = window.setTimeout(() => setProgress(70, "生成补充项目与指标…"), 1200);
+
+        btnGenerate.disabled = true;
+        const oldHtml = btnGenerate.innerHTML;
+        btnGenerate.innerHTML = `<i class="fa-solid fa-spinner mr-2 animate-spin"></i>生成中…`;
+        try {
+          const r = await fetch("/api/gap-analysis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ target_job, jd, resume, locale: "zh-CN" }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) {
+            console.error("LLM Request Error:", j);
+            throw new Error(j?.error || j?.detail || `生成失败 (HTTP ${r.status})`);
+          }
+
+          window.clearTimeout(t1);
+          window.clearTimeout(t2);
+          setProgress(92, "渲染结果…");
+
+          localStorage.setItem(StorageKeys.lastGap, JSON.stringify(j));
+          renderResult(j);
+          hideProgress();
+        } catch (e) {
+          hideProgress();
+          alert(e.message || "生成失败");
+        } finally {
+          btnGenerate.disabled = !elAiBadge.textContent.includes("已启用");
+          btnGenerate.innerHTML = oldHtml;
+        }
+      });
+
+      elAiHelp.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert("启用 AI：配置 .env（LLM_API_KEY/LLM_BASE_URL/LLM_MODEL）并运行 `python server.py`，再刷新页面。");
+      });
+
+      renderMeta();
+      checkAiHealth();
+
+      const cached = localStorage.getItem(StorageKeys.lastGap);
+      if (cached) {
+        try {
+          renderResult(JSON.parse(cached));
+        } catch {}
+      }
+    </script>
+  </body>
+</html>
+

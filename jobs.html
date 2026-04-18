@@ -54,10 +54,15 @@
                 <i class="fa-solid fa-compass"></i><span>推荐列表</span>
               </div>
               <h1 class="mt-3 text-xl font-extrabold">为你推荐的岗位方向</h1>
-              <p class="mt-1 text-sm text-slate-600">MVP：前端根据简历关键词生成候选岗位与匹配理由。</p>
+              <p class="mt-1 text-sm text-slate-600">根据简历与偏好生成岗位方向与匹配理由。</p>
             </div>
-            <button id="btnGenerate" class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800" type="button">
-              <i class="fa-solid fa-rotate mr-2"></i>重新生成
+            <button
+              id="btnGenerate"
+              class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              disabled
+            >
+              <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>生成推荐
             </button>
           </div>
 
@@ -111,7 +116,13 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                   <i class="fa-regular fa-circle-info"></i>
-                  <span>建议先在 `resume.html` 填写 JD 与简历，以提升后续模块演示效果。</span>
+                  <span>建议先填写 JD 与简历，以提升后续推荐与分析质量。</span>
+                </div>
+                <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+                  <span id="aiBadge" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    <i class="fa-solid fa-robot"></i><span>AI：检测中…</span>
+                  </span>
+                  <a id="aiHelp" href="#" class="text-xs font-semibold text-slate-600 hover:text-slate-900">如何启用？</a>
                 </div>
               </div>
             </div>
@@ -120,9 +131,34 @@
           <div class="mt-6">
             <div class="mb-3 flex items-center justify-between">
               <div class="text-sm font-extrabold">推荐岗位</div>
-              <div class="text-xs text-slate-500">点击卡片选择一个目标岗位</div>
+              <div class="text-xs text-slate-500">生成后可点击卡片设为目标岗位</div>
             </div>
-            <div id="jobsWrap" class="grid gap-4 md:grid-cols-2"></div>
+            <div id="emptyState" class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+              <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white">
+                <i class="fa-regular fa-compass text-slate-900"></i>
+              </div>
+              <div class="mt-3 text-sm font-semibold">还没有推荐结果</div>
+              <div class="mt-1 text-sm text-slate-600">填写用户画像后，点击右上角「生成推荐」。</div>
+            </div>
+
+            <div id="progressCard" class="mt-4 hidden overflow-hidden rounded-3xl border border-slate-200 bg-white">
+              <div class="p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <div class="text-sm font-extrabold">生成进度</div>
+                    <div id="progressText" class="mt-1 text-sm text-slate-600">准备中…</div>
+                  </div>
+                  <div class="grid h-10 w-10 place-items-center rounded-2xl bg-slate-50">
+                    <i class="fa-solid fa-spinner animate-spin text-slate-900"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="h-2 bg-slate-200">
+                <div id="progressBar" class="h-2 w-0 bg-slate-900 transition-[width]"></div>
+              </div>
+            </div>
+
+            <div id="jobsWrap" class="mt-4 hidden grid gap-4 md:grid-cols-2"></div>
           </div>
         </div>
 
@@ -191,7 +227,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-2">
             <i class="fa-regular fa-circle-check"></i>
-            <span>原型提示：推荐算法在此页为前端规则模拟，后续可替换为后端/LLM。</span>
+            <span>提示：推荐结果由 AI 生成（未启用 AI 时不展示）。</span>
           </div>
           <a class="font-semibold hover:text-slate-900" href="index.html">返回首页</a>
         </div>
@@ -213,86 +249,39 @@
         return v.slice(0, maxLen) + "…";
       }
 
-      function extractSignals(resume) {
-        const text = (resume || "").toLowerCase();
-        const hasReact = /react/.test(text);
-        const hasTS = /typescript|\bts\b/.test(text);
-        const hasNode = /node/.test(text);
-        const hasPerf = /(性能|performance|首屏|lcp|tti|懒加载|分包|缓存)/.test(text);
-        const hasRBAC = /(权限|rbac|acl)/.test(text);
-        const hasData = /(埋点|日志|监控|可观测|observability)/.test(text);
-        const hasAntd = /(antd|ant design)/.test(text);
-        const hasTailwind = /tailwind/.test(text);
-        return { hasReact, hasTS, hasNode, hasPerf, hasRBAC, hasData, hasAntd, hasTailwind };
+      const elAiBadge = document.getElementById("aiBadge");
+      const elAiHelp = document.getElementById("aiHelp");
+      const btnGenerate = document.getElementById("btnGenerate");
+
+      function setAiBadge(state, detail = "") {
+        const map = {
+          checking: { cls: "bg-slate-100 text-slate-700", text: "AI：检测中…" },
+          on: { cls: "bg-emerald-100 text-emerald-900", text: "AI：已启用" },
+          off: { cls: "bg-amber-100 text-amber-900", text: "AI：未启用" },
+          error: { cls: "bg-rose-100 text-rose-900", text: "AI：不可用" },
+        };
+        const v = map[state] || map.checking;
+        elAiBadge.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${v.cls}`;
+        elAiBadge.innerHTML = `<i class="fa-solid fa-robot"></i><span>${v.text}${detail ? " · " + detail : ""}</span>`;
       }
 
-      function buildJobs(persona, resume, jd) {
-        const s = extractSignals(resume);
-        const baseCity = (persona.city || "上海").trim();
-        const level = persona.level || "1-3";
-
-        const list = [];
-        list.push({
-          id: "fe-saas",
-          title: "前端工程师（B 端 SaaS）",
-          city: baseCity,
-          salary: level === "0-1" ? "12-18k" : level === "1-3" ? "18-28k" : level === "3-5" ? "28-45k" : "45k+",
-          match: Math.min(92, 78 + (s.hasReact ? 6 : 0) + (s.hasTS ? 6 : 0) + (s.hasRBAC ? 4 : 0) + (s.hasPerf ? 4 : 0)),
-          reasons: [
-            "与你的项目经历（复杂表单/业务流程）匹配",
-            s.hasRBAC ? "简历包含权限/RBAC 经验" : "建议补充权限/角色模型的落地经验",
-            s.hasPerf ? "有性能优化意识（可转化为指标型成果）" : "建议补充性能优化案例与指标",
-          ],
-          must: ["React", "TypeScript", "复杂表单", "权限/多租户"],
-          nice: ["组件库建设", "性能指标（LCP/CLS）", "可观测"],
-        });
-
-        list.push({
-          id: "fe-platform",
-          title: "前端工程师（平台/中台）",
-          city: baseCity,
-          salary: level === "0-1" ? "13-19k" : level === "1-3" ? "20-30k" : level === "3-5" ? "30-48k" : "48k+",
-          match: Math.min(90, 72 + (s.hasRBAC ? 8 : 0) + (s.hasAntd || s.hasTailwind ? 4 : 0) + (s.hasTS ? 5 : 0)),
-          reasons: [
-            "强调权限、配置化与复用能力",
-            s.hasAntd || s.hasTailwind ? "有组件库/样式体系经验" : "建议补充组件抽象与规范",
-            "适合沉淀通用表单、流程编排与可配置能力",
-          ],
-          must: ["权限模型", "组件抽象", "工程化"],
-          nice: ["低代码", "流程引擎", "可配置表单"],
-        });
-
-        list.push({
-          id: "fe-performance",
-          title: "前端工程师（性能&体验）",
-          city: baseCity,
-          salary: level === "0-1" ? "12-20k" : level === "1-3" ? "22-32k" : level === "3-5" ? "32-50k" : "50k+",
-          match: Math.min(88, 68 + (s.hasPerf ? 12 : 0) + (s.hasData ? 6 : 0) + (s.hasTS ? 4 : 0)),
-          reasons: [
-            s.hasPerf ? "已有性能优化案例基础，可深化到指标体系" : "建议补充性能指标与优化手段",
-            s.hasData ? "有监控/日志/埋点意识" : "建议补充可观测/监控指标链路",
-            "适合打造性能基线、构建性能预算与治理机制",
-          ],
-          must: ["性能指标", "工程化", "监控/埋点"],
-          nice: ["Web Vitals", "RUM", "Profiler"],
-        });
-
-        list.push({
-          id: "fe-fullstack-lite",
-          title: "前端工程师（全栈倾向）",
-          city: baseCity,
-          salary: level === "0-1" ? "12-18k" : level === "1-3" ? "18-30k" : level === "3-5" ? "30-46k" : "46k+",
-          match: Math.min(86, 66 + (s.hasNode ? 10 : 0) + (s.hasTS ? 4 : 0) + (s.hasReact ? 4 : 0)),
-          reasons: [
-            s.hasNode ? "简历包含 Node 能力，可承接 BFF/工具链" : "建议补充 Node/BFF、接口聚合与鉴权经验",
-            "适合快速迭代业务、降低前后端沟通成本",
-            jd && jd.trim().length > 20 ? "可将 JD 要求映射到端到端交付能力" : "建议补齐 JD，以提高后续模块演示",
-          ],
-          must: ["React", "TypeScript", "Node（BFF）"],
-          nice: ["鉴权", "缓存", "接口聚合"],
-        });
-
-        return list.sort((a, b) => b.match - a.match);
+      async function checkAiHealth() {
+        setAiBadge("checking");
+        try {
+          const r = await fetch("/api/health", { cache: "no-store" });
+          if (!r.ok) throw new Error("health not ok");
+          const j = await r.json();
+          if (j && j.ok && j.hasOpenAIKey) {
+            setAiBadge("on");
+            btnGenerate.disabled = false;
+          } else {
+            setAiBadge("off", "缺少 Key");
+            btnGenerate.disabled = true;
+          }
+        } catch {
+          setAiBadge("off", "未运行服务");
+          btnGenerate.disabled = true;
+        }
       }
 
       function savePersona() {
@@ -317,6 +306,9 @@
 
       function setChosen(job) {
         localStorage.setItem(StorageKeys.chosenJob, JSON.stringify(job));
+        const salary = job.salary_range || job.salary || "-";
+        const must = Array.isArray(job.must_have) ? job.must_have : Array.isArray(job.must) ? job.must : [];
+        const nice = Array.isArray(job.nice_to_have) ? job.nice_to_have : Array.isArray(job.nice) ? job.nice : [];
         const wrap = document.getElementById("chosenCard");
         wrap.className = "mt-6 rounded-3xl border border-slate-200 bg-white p-5";
         wrap.innerHTML = `
@@ -324,18 +316,18 @@
             <div class="min-w-0">
               <div class="text-xs font-semibold text-slate-500">已选择目标岗位</div>
               <div class="mt-1 text-lg font-extrabold">${job.title}</div>
-              <div class="mt-1 text-sm text-slate-600">${job.city} · ${job.salary} · 匹配度 <span class="font-semibold text-slate-900">${job.match}%</span></div>
+              <div class="mt-1 text-sm text-slate-600">${job.city || "-"} · ${salary} · 匹配度 <span class="font-semibold text-slate-900">${job.match ?? "-"}%</span></div>
             </div>
             <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900"><i class="fa-solid fa-bullseye mr-1"></i>目标</span>
           </div>
           <div class="mt-4 grid gap-2 sm:grid-cols-2">
             <div class="rounded-2xl bg-slate-50 p-3">
               <div class="text-xs font-semibold text-slate-500">必备</div>
-              <div class="mt-1 text-sm font-semibold text-slate-900">${job.must.slice(0, 3).join(" / ")}</div>
+              <div class="mt-1 text-sm font-semibold text-slate-900">${must.slice(0, 3).join(" / ") || "-"}</div>
             </div>
             <div class="rounded-2xl bg-slate-50 p-3">
               <div class="text-xs font-semibold text-slate-500">加分</div>
-              <div class="mt-1 text-sm font-semibold text-slate-900">${job.nice.slice(0, 3).join(" / ")}</div>
+              <div class="mt-1 text-sm font-semibold text-slate-900">${nice.slice(0, 3).join(" / ") || "-"}</div>
             </div>
           </div>
         `;
@@ -364,7 +356,7 @@
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
                 <div class="text-lg font-extrabold">${job.title}</div>
-                <div class="mt-1 text-sm text-slate-600">${job.city} · ${job.salary}</div>
+                <div class="mt-1 text-sm text-slate-600">${job.city} · ${job.salary_range || "-"}</div>
               </div>
               <div class="shrink-0 rounded-2xl bg-slate-900 px-3 py-2 text-sm font-extrabold text-white">${job.match}%</div>
             </div>
@@ -372,7 +364,7 @@
               <div class="rounded-2xl bg-slate-50 p-3">
                 <div class="text-xs font-semibold text-slate-500">匹配理由</div>
                 <ul class="mt-2 space-y-1 text-sm text-slate-700">
-                  ${job.reasons
+                  ${(job.reasoning || [])
                     .slice(0, 3)
                     .map((r) => `<li class="flex gap-2"><i class="fa-regular fa-circle-check mt-0.5 text-slate-900"></i><span>${r}</span></li>`)
                     .join("")}
@@ -381,7 +373,7 @@
               <div class="rounded-2xl bg-slate-50 p-3">
                 <div class="text-xs font-semibold text-slate-500">关键词</div>
                 <div class="mt-2 flex flex-wrap gap-2">
-                  ${job.must
+                  ${(job.must_have || [])
                     .slice(0, 4)
                     .map((t) => `<span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">${t}</span>`)
                     .join("")}
@@ -405,12 +397,92 @@
         document.getElementById("jdMeta").textContent = shortText(jd, 90);
       }
 
-      function regenerate() {
+      function setProgress(pct, text) {
+        const card = document.getElementById("progressCard");
+        const bar = document.getElementById("progressBar");
+        const t = document.getElementById("progressText");
+        card.classList.remove("hidden");
+        bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        t.textContent = text || "进行中…";
+      }
+
+      function hideProgress() {
+        document.getElementById("progressCard").classList.add("hidden");
+        document.getElementById("progressBar").style.width = "0%";
+      }
+
+      // COT (Chain of Thought) steps for job recommendations
+      const jobsCotSteps = [
+        { pct: 15, text: "分析用户画像…", detail: "提取职业级别、城市偏好、技术方向" },
+        { pct: 30, text: "解析简历技能…", detail: "识别技术栈、项目经验、核心能力" },
+        { pct: 45, text: "匹配岗位市场…", detail: "对比市场需求与个人能力" },
+        { pct: 60, text: "生成岗位推荐…", detail: "筛选匹配度高的目标岗位" },
+        { pct: 75, text: "撰写匹配理由…", detail: "分析每个岗位的适配性" },
+        { pct: 90, text: "整理必备技能…", detail: "列出每个岗位的要求和建议" },
+      ];
+
+      async function generate() {
+        if (!elAiBadge.textContent.includes("已启用")) return;
         const persona = savePersona();
         const resume = localStorage.getItem(StorageKeys.resume) || "";
         const jd = localStorage.getItem(StorageKeys.jd) || "";
-        const list = buildJobs(persona, resume, jd);
-        renderJobs(list);
+        if ((resume || "").trim().length < 50) {
+          alert("请先在「简历诊断」页面填写/上传简历（至少 50 字）。");
+          return;
+        }
+
+        document.getElementById("emptyState").classList.add("hidden");
+        const wrap = document.getElementById("jobsWrap");
+        wrap.classList.add("hidden");
+        
+        // Start COT animation
+        let currentStep = 0;
+        setProgress(jobsCotSteps[0].pct, `${jobsCotSteps[0].text} ${jobsCotSteps[0].detail}`);
+        
+        const cotInterval = window.setInterval(() => {
+          currentStep++;
+          if (currentStep < jobsCotSteps.length) {
+            setProgress(jobsCotSteps[currentStep].pct, `${jobsCotSteps[currentStep].text} ${jobsCotSteps[currentStep].detail}`);
+          }
+        }, 3000); // Update every 3 seconds
+
+        btnGenerate.disabled = true;
+        const oldHtml = btnGenerate.innerHTML;
+        btnGenerate.innerHTML = `<i class="fa-solid fa-spinner mr-2 animate-spin"></i>生成中…`;
+        
+        const startTime = Date.now();
+        
+        try {
+          const r = await fetch("/api/job-recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ persona, resume, jd, locale: "zh-CN" }),
+          });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok) {
+            console.error("LLM Request Error:", j);
+            throw new Error(j?.error || j?.detail || `生成失败 (HTTP ${r.status})`);
+          }
+
+          window.clearInterval(cotInterval);
+          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+          setProgress(100, `完成！耗时 ${elapsed} 秒`);
+          
+          // Show completion for 1 second before hiding
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          const positions = Array.isArray(j.positions) ? j.positions : [];
+          wrap.classList.remove("hidden");
+          renderJobs(positions);
+          hideProgress();
+        } catch (e) {
+          window.clearInterval(cotInterval);
+          hideProgress();
+          alert(e.message || "生成失败");
+        } finally {
+          btnGenerate.disabled = !elAiBadge.textContent.includes("已启用");
+          btnGenerate.innerHTML = oldHtml;
+        }
       }
 
       const persisted = loadPersona();
@@ -421,15 +493,16 @@
       }
 
       renderMeta();
-      regenerate();
+      checkAiHealth();
 
-      document.getElementById("btnGenerate").addEventListener("click", regenerate);
-      document.getElementById("level").addEventListener("change", regenerate);
-      document.getElementById("city").addEventListener("input", () => {
-        savePersona();
-      });
-      document.getElementById("pref").addEventListener("input", () => {
-        savePersona();
+      btnGenerate.addEventListener("click", generate);
+      document.getElementById("level").addEventListener("change", () => {});
+      document.getElementById("city").addEventListener("input", savePersona);
+      document.getElementById("pref").addEventListener("input", savePersona);
+
+      elAiHelp.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert("启用 AI：配置 .env（LLM_API_KEY/LLM_BASE_URL/LLM_MODEL）并运行 `python server.py`，再刷新页面。");
       });
 
       const chosenRaw = localStorage.getItem(StorageKeys.chosenJob);

@@ -58,13 +58,9 @@
               <h1 class="mt-3 text-xl font-extrabold">粘贴岗位描述与简历</h1>
               <p class="mt-1 text-sm text-slate-600">支持文本粘贴与上传文件读取（MVP：本地解析）。</p>
             </div>
-            <button
-              id="btnSample"
-              class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-              type="button"
-            >
-              <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>填充示例
-            </button>
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50">
+              <i class="fa-solid fa-pen-nib text-slate-900"></i>
+            </div>
           </div>
 
           <div class="mt-5 grid gap-4">
@@ -79,6 +75,30 @@
                   <button id="btnClearJD" class="rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100" type="button">
                     清空
                   </button>
+                </div>
+              </div>
+              <div id="jdUploadRow" class="hidden rounded-2xl border border-slate-200 bg-white p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span id="jdUploadBadge" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        <i class="fa-solid fa-file-arrow-up"></i><span>未开始</span>
+                      </span>
+                      <span id="jdUploadName" class="truncate text-sm font-semibold text-slate-900">-</span>
+                      <span id="jdUploadSize" class="text-xs text-slate-500">-</span>
+                    </div>
+                    <div id="jdUploadHint" class="mt-1 text-xs text-slate-600">-</div>
+                  </div>
+                  <button
+                    id="jdUploadDelete"
+                    class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    type="button"
+                  >
+                    <i class="fa-regular fa-trash-can mr-2"></i>删除
+                  </button>
+                </div>
+                <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div id="jdUploadBar" class="h-2 w-0 rounded-full bg-slate-900 transition-[width]"></div>
                 </div>
               </div>
               <textarea
@@ -112,6 +132,30 @@
                   </button>
                 </div>
               </div>
+              <div id="resumeUploadRow" class="hidden rounded-2xl border border-slate-200 bg-white p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span id="resumeUploadBadge" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        <i class="fa-solid fa-file-arrow-up"></i><span>未开始</span>
+                      </span>
+                      <span id="resumeUploadName" class="truncate text-sm font-semibold text-slate-900">-</span>
+                      <span id="resumeUploadSize" class="text-xs text-slate-500">-</span>
+                    </div>
+                    <div id="resumeUploadHint" class="mt-1 text-xs text-slate-600">-</div>
+                  </div>
+                  <button
+                    id="resumeUploadDelete"
+                    class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    type="button"
+                  >
+                    <i class="fa-regular fa-trash-can mr-2"></i>删除
+                  </button>
+                </div>
+                <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div id="resumeUploadBar" class="h-2 w-0 rounded-full bg-slate-900 transition-[width]"></div>
+                </div>
+              </div>
               <textarea
                 id="resume"
                 class="h-56 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
@@ -130,11 +174,18 @@
           <div class="mt-6 flex flex-wrap items-center gap-2">
             <button
               id="btnAnalyze"
-              class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               type="button"
+              disabled
             >
               <i class="fa-solid fa-magnifying-glass mr-2"></i>开始诊断
             </button>
+            <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
+              <span id="aiBadge" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-robot"></i><span>AI：检测中…</span>
+              </span>
+              <a id="aiHelp" href="#" class="text-xs font-semibold text-slate-600 hover:text-slate-900">如何启用？</a>
+            </div>
             <button
               id="btnSave"
               class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50"
@@ -160,8 +211,8 @@
               <div class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                 <i class="fa-solid fa-stethoscope"></i><span>输出区</span>
               </div>
-              <h2 class="mt-3 text-xl font-extrabold">诊断结果（示例结构）</h2>
-              <p class="mt-1 text-sm text-slate-600">该区域用于对齐信息层级与后端接口形状。</p>
+              <h2 class="mt-3 text-xl font-extrabold">诊断结果</h2>
+              <p class="mt-1 text-sm text-slate-600">将结合岗位与简历，给出可执行修改与完整改写版本。</p>
             </div>
             <div class="grid h-12 w-12 place-items-center rounded-2xl bg-slate-50">
               <i class="fa-solid fa-layer-group text-slate-900"></i>
@@ -173,10 +224,26 @@
               <i class="fa-regular fa-file-lines text-slate-900"></i>
             </div>
             <div class="mt-3 text-sm font-semibold">还没有诊断结果</div>
-            <div class="mt-1 text-sm text-slate-600">点击左侧「开始诊断」生成示例结果。</div>
+            <div class="mt-1 text-sm text-slate-600">填写岗位描述与简历后，点击左侧「开始诊断」。</div>
           </div>
 
           <div id="result" class="mt-6 hidden space-y-4">
+            <div id="progressCard" class="hidden overflow-hidden rounded-3xl border border-slate-200 bg-white">
+              <div class="p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <div class="text-sm font-extrabold">诊断进度</div>
+                    <div id="progressText" class="mt-1 text-sm text-slate-600">准备中…</div>
+                  </div>
+                  <div class="grid h-10 w-10 place-items-center rounded-2xl bg-slate-50">
+                    <i class="fa-solid fa-spinner animate-spin text-slate-900"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="h-2 bg-slate-200">
+                <div id="progressBar" class="h-2 w-0 bg-slate-900 transition-[width]"></div>
+              </div>
+            </div>
             <div class="grid gap-3 sm:grid-cols-3">
               <div class="rounded-2xl bg-slate-50 p-4">
                 <div class="text-xs font-semibold text-slate-500">综合评分（示例）</div>
@@ -205,7 +272,7 @@
                 <div class="text-sm font-extrabold">问题点</div>
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">表达 / 结构 / 数据</span>
               </div>
-              <div id="issues" class="mt-4 space-y-3"></div>
+              <ol id="issues" class="mt-4 space-y-3 list-decimal pl-5"></ol>
             </div>
 
             <div class="rounded-3xl border border-slate-200 bg-white p-5">
@@ -214,6 +281,36 @@
                 <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">可直接落简历</span>
               </div>
               <div id="suggestions" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div id="rewriteCard" class="hidden rounded-3xl border border-slate-200 bg-white p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold">完整改写简历（可导出）</div>
+                  <div class="mt-1 text-sm text-slate-600">基于你的原简历与岗位要求生成，可直接复制或导出文件。</div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button
+                    id="btnCopyRewrite"
+                    class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+                    type="button"
+                  >
+                    <i class="fa-regular fa-copy mr-2"></i>复制
+                  </button>
+                  <button
+                    id="btnExportRewrite"
+                    class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                    type="button"
+                  >
+                    <i class="fa-solid fa-download mr-2"></i>导出 .md
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="rewrittenResume"
+                class="mt-4 h-64 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
+                placeholder="诊断完成后会在这里生成完整改写简历…"
+              ></textarea>
             </div>
 
             <div class="rounded-3xl bg-slate-900 p-5 text-white">
@@ -260,6 +357,32 @@
       const elResume = document.getElementById("resume");
       const elToast = document.getElementById("toast");
       const elNext = document.getElementById("btnNext");
+      const elAiBadge = document.getElementById("aiBadge");
+      const elAiHelp = document.getElementById("aiHelp");
+
+      const jdUpload = {
+        row: document.getElementById("jdUploadRow"),
+        badge: document.getElementById("jdUploadBadge"),
+        name: document.getElementById("jdUploadName"),
+        size: document.getElementById("jdUploadSize"),
+        hint: document.getElementById("jdUploadHint"),
+        bar: document.getElementById("jdUploadBar"),
+        del: document.getElementById("jdUploadDelete"),
+        input: document.getElementById("jdFile"),
+        targetTextarea: elJD,
+      };
+
+      const resumeUpload = {
+        row: document.getElementById("resumeUploadRow"),
+        badge: document.getElementById("resumeUploadBadge"),
+        name: document.getElementById("resumeUploadName"),
+        size: document.getElementById("resumeUploadSize"),
+        hint: document.getElementById("resumeUploadHint"),
+        bar: document.getElementById("resumeUploadBar"),
+        del: document.getElementById("resumeUploadDelete"),
+        input: document.getElementById("resumeFile"),
+        targetTextarea: elResume,
+      };
 
       function showToast(message, kind = "ok") {
         elToast.classList.remove("hidden");
@@ -409,13 +532,17 @@
               : item.severity === "中"
                 ? "bg-amber-100 text-amber-900"
                 : "bg-slate-100 text-slate-900";
-          const el = document.createElement("div");
-          el.className = "rounded-2xl border border-slate-200 bg-white p-4";
-          el.innerHTML = `
-            <div class="flex flex-wrap items-center justify-between gap-2">
+          const li = document.createElement("li");
+          li.className = "rounded-2xl border border-slate-200 bg-white p-4";
+          const why = item.why_it_matters ? `<div class="mt-2 text-sm text-slate-700"><span class="font-semibold text-slate-900">为什么重要：</span>${item.why_it_matters}</div>` : "";
+          const how = item.how_to_fix ? `<div class="mt-1 text-sm text-slate-700"><span class="font-semibold text-slate-900">怎么改：</span>${item.how_to_fix}</div>` : "";
+          li.innerHTML = `
+            <div class="flex flex-wrap items-start justify-between gap-2">
               <div class="min-w-0">
                 <div class="text-sm font-extrabold">${item.title}</div>
                 <div class="mt-1 text-sm text-slate-600">${item.detail}</div>
+                ${why}
+                ${how}
               </div>
               <div class="flex items-center gap-2">
                 <span class="rounded-full px-3 py-1 text-xs font-semibold ${severityClass}">优先级：${item.severity}</span>
@@ -423,7 +550,7 @@
               </div>
             </div>
           `;
-          issuesWrap.appendChild(el);
+          issuesWrap.appendChild(li);
         }
 
         const suggWrap = document.getElementById("suggestions");
@@ -432,7 +559,10 @@
           const el = document.createElement("div");
           el.className = "rounded-2xl bg-slate-50 p-4";
           el.innerHTML = `
-            <div class="text-sm font-extrabold">${s.title}</div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="text-sm font-extrabold">${s.title}</div>
+              ${s.priority ? `<span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">${s.priority}</span>` : ""}
+            </div>
             <div class="mt-2 rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-700">
               <div class="text-xs font-semibold text-slate-500">可直接替换示例</div>
               <div class="mt-1">${s.example}</div>
@@ -442,15 +572,218 @@
         }
       }
 
+      function renderHighlights(highlights) {
+        const containerId = "highlights";
+        let box = document.getElementById(containerId);
+        if (!box) {
+          const result = document.getElementById("result");
+          const card = document.createElement("div");
+          card.className = "rounded-3xl border border-slate-200 bg-white p-5";
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-extrabold">亮点（可保留/强化）</div>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">来自 AI 诊断</span>
+            </div>
+            <div id="${containerId}" class="mt-4 flex flex-wrap gap-2"></div>
+          `;
+          result.insertBefore(card, result.children[1] || null);
+          box = document.getElementById(containerId);
+        }
+        box.innerHTML = "";
+        (highlights || []).slice(0, 8).forEach((h) => {
+          const tag = document.createElement("span");
+          tag.className = "rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700";
+          tag.textContent = h;
+          box.appendChild(tag);
+        });
+      }
+
+      function setAiBadge(state, detail = "") {
+        const map = {
+          checking: { cls: "bg-slate-100 text-slate-700", text: "AI：检测中…" },
+          on: { cls: "bg-emerald-100 text-emerald-900", text: "AI：已启用（使用真实简历）" },
+          off: { cls: "bg-amber-100 text-amber-900", text: "AI：未启用" },
+          error: { cls: "bg-rose-100 text-rose-900", text: "AI：不可用" },
+        };
+        const v = map[state] || map.checking;
+        elAiBadge.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${v.cls}`;
+        elAiBadge.innerHTML = `<i class="fa-solid fa-robot"></i><span>${v.text}${detail ? " · " + detail : ""}</span>`;
+      }
+
+      async function checkAiHealth() {
+        setAiBadge("checking");
+        try {
+          const r = await fetch("/api/health", { cache: "no-store" });
+          if (!r.ok) throw new Error("health not ok");
+          const j = await r.json();
+          const btn = document.getElementById("btnAnalyze");
+          if (j && j.ok && j.hasOpenAIKey) {
+            setAiBadge("on");
+            btn.disabled = false;
+          } else {
+            setAiBadge("off", "缺少 Key");
+            btn.disabled = true;
+          }
+        } catch {
+          setAiBadge("off", "未运行服务");
+          document.getElementById("btnAnalyze").disabled = true;
+        }
+      }
+
+      async function analyzeWithAi(jd, resume) {
+        const r = await fetch("/api/resume-diagnosis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jd, resume, locale: "zh-CN" }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          const msg = j?.error || "AI 诊断失败";
+          const detail = j?.detail ? `：${j.detail}` : "";
+          throw new Error(msg + detail);
+        }
+        return j;
+      }
+
       async function readTextFile(file) {
         if (!file) return "";
         if (!/^text\/|application\/(json|xml)/.test(file.type) && !/\.(txt|md|json)$/i.test(file.name)) {
-          throw new Error("该原型仅支持读取 .txt/.md 等纯文本文件（PDF/DOCX 需后端解析）。");
+          throw new Error("暂不支持解析该格式（建议导出为 .txt/.md 再上传；PDF/DOCX 需要后端解析）。");
         }
         return await file.text();
       }
 
-      document.getElementById("btnAnalyze").addEventListener("click", () => {
+      function formatBytes(bytes) {
+        const n = Number(bytes || 0);
+        if (!Number.isFinite(n) || n <= 0) return "0 B";
+        const units = ["B", "KB", "MB", "GB"];
+        const i = Math.min(units.length - 1, Math.floor(Math.log(n) / Math.log(1024)));
+        const v = n / Math.pow(1024, i);
+        return `${v.toFixed(v >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+      }
+
+      function setUploadUI(u, state, { name, size, hint, progress } = {}) {
+        u.row.classList.remove("hidden");
+        if (name != null) u.name.textContent = name;
+        if (size != null) u.size.textContent = size;
+        if (hint != null) u.hint.textContent = hint;
+        if (progress != null) u.bar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+
+        const map = {
+          idle: { cls: "bg-slate-100 text-slate-700", icon: "fa-file-arrow-up", text: "待处理" },
+          reading: { cls: "bg-slate-900 text-white", icon: "fa-spinner", text: "读取中…" },
+          ok: { cls: "bg-emerald-100 text-emerald-900", icon: "fa-circle-check", text: "已成功" },
+          warn: { cls: "bg-amber-100 text-amber-900", icon: "fa-triangle-exclamation", text: "需处理" },
+          error: { cls: "bg-rose-100 text-rose-900", icon: "fa-circle-xmark", text: "失败" },
+        };
+        const v = map[state] || map.idle;
+        const spin = state === "reading" ? "animate-spin" : "";
+        u.badge.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${v.cls}`;
+        u.badge.innerHTML = `<i class="fa-solid ${v.icon} ${spin}"></i><span>${v.text}</span>`;
+      }
+
+      function resetUploadUI(u) {
+        u.row.classList.add("hidden");
+        u.name.textContent = "-";
+        u.size.textContent = "-";
+        u.hint.textContent = "-";
+        u.bar.style.width = "0%";
+      }
+
+      function wireDelete(u) {
+        u.del.addEventListener("click", () => {
+          u.targetTextarea.value = "";
+          setCounts();
+          enableNextIfReady();
+          resetUploadUI(u);
+          showToast("已删除上传内容", "ok");
+        });
+      }
+
+      wireDelete(jdUpload);
+      wireDelete(resumeUpload);
+
+      function setProgress(pct, text) {
+        const card = document.getElementById("progressCard");
+        const bar = document.getElementById("progressBar");
+        const t = document.getElementById("progressText");
+        card.classList.remove("hidden");
+        bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        t.textContent = text || "进行中…";
+      }
+
+      function hideProgress() {
+        document.getElementById("progressCard").classList.add("hidden");
+        document.getElementById("progressBar").style.width = "0%";
+      }
+
+      function normalizeDiagnosis(data) {
+        const score = Number(data?.score);
+        const out = { ...data };
+        out.score = Number.isFinite(score) ? Math.max(0, Math.min(100, Math.round(score))) : 70;
+        out.issues = Array.isArray(out.issues) ? out.issues : [];
+        out.suggestions = Array.isArray(out.suggestions) ? out.suggestions : [];
+        out.highlights = Array.isArray(out.highlights) ? out.highlights : [];
+        out.rewritten_resume = typeof out.rewritten_resume === "string" ? out.rewritten_resume : "";
+        return out;
+      }
+
+      function renderRewrite(text) {
+        const card = document.getElementById("rewriteCard");
+        const ta = document.getElementById("rewrittenResume");
+        if ((text || "").trim()) {
+          card.classList.remove("hidden");
+          ta.value = text.trim();
+        } else {
+          card.classList.add("hidden");
+          ta.value = "";
+        }
+      }
+
+      function exportText(filename, text) {
+        const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      document.getElementById("btnCopyRewrite").addEventListener("click", async () => {
+        const t = (document.getElementById("rewrittenResume").value || "").trim();
+        if (!t) return showToast("没有可复制的内容", "warn");
+        try {
+          await navigator.clipboard.writeText(t);
+          showToast("已复制到剪贴板", "ok");
+        } catch {
+          showToast("复制失败，请手动全选复制", "warn");
+        }
+      });
+
+      document.getElementById("btnExportRewrite").addEventListener("click", () => {
+        const t = (document.getElementById("rewrittenResume").value || "").trim();
+        if (!t) return showToast("没有可导出的内容", "warn");
+        const ts = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const name = `resume-rewrite-${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}.md`;
+        exportText(name, t + "\n");
+        showToast("已导出文件", "ok");
+      });
+
+      // COT (Chain of Thought) steps for resume diagnosis
+      const resumeCotSteps = [
+        { pct: 10, text: "解析简历结构…", detail: "提取教育背景、项目经历、技能关键词" },
+        { pct: 25, text: "分析岗位JD要求…", detail: "识别核心技能、经验要求、加分项" },
+        { pct: 40, text: "匹配度评估…", detail: "对比简历与JD的匹配程度" },
+        { pct: 55, text: "诊断问题点…", detail: "识别表达、结构、数据缺失等问题" },
+        { pct: 70, text: "生成改进建议…", detail: "提供可执行的优化方案" },
+        { pct: 85, text: "改写简历内容…", detail: "生成优化后的完整简历" },
+      ];
+
+      document.getElementById("btnAnalyze").addEventListener("click", async () => {
         const jd = (elJD.value || "").trim();
         const resume = (elResume.value || "").trim();
         if (jd.length < 20 || resume.length < 50) {
@@ -458,11 +791,63 @@
           return;
         }
         saveInputs();
-        const data = buildDiagnosis(jd, resume);
-        localStorage.setItem(StorageKeys.lastResumeDiagnosis, JSON.stringify(data));
-        renderDiagnosis(data);
-        enableNextIfReady();
-        showToast("诊断已生成（示例）");
+
+        const btn = document.getElementById("btnAnalyze");
+        const oldHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.classList.add("opacity-70", "cursor-not-allowed");
+        btn.innerHTML = `<i class="fa-solid fa-spinner mr-2 animate-spin"></i>诊断中…`;
+
+        const startTime = Date.now();
+        let cotInterval = null;
+
+        try {
+          const aiHealth = elAiBadge.textContent.includes("已启用");
+          if (!aiHealth) {
+            showToast("AI 未启用：请先启动本地服务并配置 Key", "warn");
+            return;
+          }
+
+          document.getElementById("emptyState").classList.add("hidden");
+          document.getElementById("result").classList.remove("hidden");
+          
+          // Start COT animation
+          let currentStep = 0;
+          setProgress(resumeCotSteps[0].pct, `${resumeCotSteps[0].text} ${resumeCotSteps[0].detail}`);
+          
+          cotInterval = window.setInterval(() => {
+            currentStep++;
+            if (currentStep < resumeCotSteps.length) {
+              setProgress(resumeCotSteps[currentStep].pct, `${resumeCotSteps[currentStep].text} ${resumeCotSteps[currentStep].detail}`);
+            }
+          }, 3500); // Update every 3.5 seconds
+
+          const dataRaw = await analyzeWithAi(jd, resume);
+          
+          window.clearInterval(cotInterval);
+          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+          setProgress(100, `完成！耗时 ${elapsed} 秒`);
+
+          const data = normalizeDiagnosis(dataRaw);
+          localStorage.setItem(StorageKeys.lastResumeDiagnosis, JSON.stringify(data));
+          renderDiagnosis(data);
+            if (Array.isArray(data.highlights) && data.highlights.length) {
+              renderHighlights(data.highlights);
+            }
+          renderRewrite(data.rewritten_resume);
+            enableNextIfReady();
+          window.setTimeout(() => hideProgress(), 800);
+          showToast("诊断完成", "ok");
+        } catch (err) {
+          if (cotInterval) window.clearInterval(cotInterval);
+          setAiBadge("error");
+          hideProgress();
+          showToast(err.message || "诊断失败，请检查 Key/模型/网络", "bad");
+        } finally {
+          btn.disabled = !elAiBadge.textContent.includes("已启用");
+          btn.classList.remove("opacity-70", "cursor-not-allowed");
+          btn.innerHTML = oldHtml;
+        }
       });
 
       document.getElementById("btnSave").addEventListener("click", () => {
@@ -470,16 +855,17 @@
         enableNextIfReady();
       });
 
-      document.getElementById("btnSample").addEventListener("click", () => setSample());
       document.getElementById("btnClearJD").addEventListener("click", () => {
         elJD.value = "";
         setCounts();
         enableNextIfReady();
+        resetUploadUI(jdUpload);
       });
       document.getElementById("btnClearResume").addEventListener("click", () => {
         elResume.value = "";
         setCounts();
         enableNextIfReady();
+        resetUploadUI(resumeUpload);
       });
 
       elJD.addEventListener("input", () => {
@@ -494,12 +880,32 @@
       document.getElementById("jdFile").addEventListener("change", async (e) => {
         try {
           const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          setUploadUI(jdUpload, "reading", {
+            name: file.name,
+            size: formatBytes(file.size),
+            hint: "正在读取文件内容…",
+            progress: 15,
+          });
+
           const text = await readTextFile(file);
+          jdUpload.bar.style.width = "85%";
           elJD.value = text;
           setCounts();
           enableNextIfReady();
-          showToast(`已读取：${file.name}`);
+          setUploadUI(jdUpload, "ok", {
+            hint: "已读取到文本并填入输入框。",
+            progress: 100,
+          });
+          showToast(`已读取：${file.name}`, "ok");
         } catch (err) {
+          const file = e.target.files && e.target.files[0];
+          setUploadUI(jdUpload, "warn", {
+            name: file?.name || "未知文件",
+            size: formatBytes(file?.size || 0),
+            hint: err.message || "读取失败（可删除后重试）",
+            progress: 100,
+          });
           showToast(err.message || "读取失败", "bad");
         } finally {
           e.target.value = "";
@@ -509,12 +915,32 @@
       document.getElementById("resumeFile").addEventListener("change", async (e) => {
         try {
           const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          setUploadUI(resumeUpload, "reading", {
+            name: file.name,
+            size: formatBytes(file.size),
+            hint: "正在读取文件内容…",
+            progress: 15,
+          });
+
           const text = await readTextFile(file);
+          resumeUpload.bar.style.width = "85%";
           elResume.value = text;
           setCounts();
           enableNextIfReady();
-          showToast(`已读取：${file.name}`);
+          setUploadUI(resumeUpload, "ok", {
+            hint: "已读取到文本并填入输入框。",
+            progress: 100,
+          });
+          showToast(`已读取：${file.name}`, "ok");
         } catch (err) {
+          const file = e.target.files && e.target.files[0];
+          setUploadUI(resumeUpload, "warn", {
+            name: file?.name || "未知文件",
+            size: formatBytes(file?.size || 0),
+            hint: err.message || "读取失败（可删除后重试）",
+            progress: 100,
+          });
           showToast(err.message || "读取失败", "bad");
         } finally {
           e.target.value = "";
@@ -522,11 +948,27 @@
       });
 
       loadInputs();
+      checkAiHealth();
+
+      // If there is already text present, keep upload UI hidden.
+      // Users can still upload later and will see the upload row.
+
+      elAiHelp.addEventListener("click", (e) => {
+        e.preventDefault();
+        showToast("启用 AI：配置 .env（LLM_API_KEY/LLM_BASE_URL/LLM_MODEL）并运行 `python server.py`，再刷新页面。", "warn");
+      });
 
       const cached = localStorage.getItem(StorageKeys.lastResumeDiagnosis);
       if (cached) {
         try {
-          renderDiagnosis(JSON.parse(cached));
+          const parsed = JSON.parse(cached);
+          renderDiagnosis(parsed);
+          if (Array.isArray(parsed.highlights) && parsed.highlights.length) {
+            renderHighlights(parsed.highlights);
+          }
+          if (typeof parsed.rewritten_resume === "string" && parsed.rewritten_resume.trim()) {
+            renderRewrite(parsed.rewritten_resume);
+          }
         } catch {}
       }
     </script>
