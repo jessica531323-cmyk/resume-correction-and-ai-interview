@@ -185,7 +185,7 @@
             <a
               id="btnToGap"
               href="gap.html"
-              class="pointer-events-none inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white/60"
+              class="pointer-events-none inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
               aria-disabled="true"
             >
               去能力差距分析<i class="fa-solid fa-arrow-right ml-2"></i>
@@ -336,7 +336,7 @@
         const btnInterview = document.getElementById("btnToInterview");
 
         btnGap.classList.remove("pointer-events-none", "text-white/60");
-        btnGap.classList.add("hover:bg-slate-800");
+        btnGap.classList.add("text-white", "hover:bg-slate-800");
         btnGap.removeAttribute("aria-disabled");
 
         btnInterview.classList.remove("pointer-events-none", "text-slate-400");
