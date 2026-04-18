@@ -206,15 +206,19 @@ Language: ${locale || "zh-CN"}.
 
 Schema:
 {
-  "gaps": Array<{ "area": string, "evidence": string, "severity": "高"|"中"|"低" }>,
-  "plan": Array<{ "week": number, "goal": string, "actions": Array<string>, "deliverable": string, "success_metric": string }>,
+  "summary": string,
+  "missing_skills": Array<{ "skill": string, "why": string, "evidence_gap": string, "how_to_gain": Array<string>, "priority": "P0"|"P1"|"P2" }>,
+  "project_suggestions": Array<{ "title": string, "goal": string, "scope": Array<string>, "tech_stack": Array<string>, "metrics": Array<string> }>,
+  "action_plan": Array<{ "week": number, "goal": string, "actions": Array<string>, "deliverable": string, "success_metric": string }>,
   "export_markdown": string
 }
 
 Rules:
-- Analyze gaps between resume and target job requirements.
-- Create a 7-day actionable plan.
-- Export markdown should be a summary report.`;
+- summary: A concise summary of the gap analysis (2-3 sentences).
+- missing_skills: 5-8 skills missing based on JD vs resume comparison.
+- project_suggestions: 2-3 project ideas to fill the gaps.
+- action_plan: A 7-day actionable plan.
+- export_markdown: A formatted summary report.`;
 
   const user = `Target Job: ${JSON.stringify(target_job)}
 JD: ${jd || ""}

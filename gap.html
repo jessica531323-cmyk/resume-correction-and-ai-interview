@@ -184,22 +184,19 @@
             <div class="rounded-3xl border border-slate-200 bg-white p-5">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <div class="text-sm font-extrabold">导出内容（Markdown）</div>
-                  <div class="mt-1 text-sm text-slate-600">可直接复制或导出文件。</div>
+                  <div class="text-sm font-extrabold">导出内容</div>
+                  <div class="mt-1 text-sm text-slate-600">可直接复制以下内容。</div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                   <button id="btnCopy" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50" type="button">
                     <i class="fa-regular fa-copy mr-2"></i>复制
-                  </button>
-                  <button id="btnExport" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800" type="button">
-                    <i class="fa-solid fa-download mr-2"></i>导出 .md
                   </button>
                 </div>
               </div>
               <textarea
                 id="export"
                 class="mt-4 h-64 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
-                placeholder="生成后会在这里提供可导出的 Markdown…"
+                placeholder="生成后会在这里提供可复制的内容…"
               ></textarea>
             </div>
 
@@ -400,12 +397,14 @@
 
         const plan = document.getElementById("plan");
         plan.innerHTML = "";
-        (data.learning_plan_14d || []).forEach((d) => {
+        (data.action_plan || data.learning_plan_14d || []).forEach((d) => {
           const li = document.createElement("li");
           li.className = "rounded-2xl border border-slate-200 bg-white p-4";
+          const title = d.week ? `Week ${d.week}: ${d.goal || "-"}` : `Day ${d.day}: ${d.focus || "-"}`;
           li.innerHTML = `
-            <div class="text-sm font-extrabold">Day ${d.day}: ${d.focus || "-"}</div>
+            <div class="text-sm font-extrabold">${title}</div>
             <div class="mt-1 text-sm text-slate-600">${d.deliverable || ""}</div>
+            ${d.actions ? `<div class="mt-2 text-sm text-slate-700"><span class="font-semibold">行动：</span>${d.actions.join("；")}</div>` : ""}
           `;
           plan.appendChild(li);
         });
@@ -418,15 +417,6 @@
         if (!t.trim()) return;
         await copyText(t);
         alert("已复制");
-      });
-      document.getElementById("btnExport").addEventListener("click", () => {
-        const t = document.getElementById("export").value || "";
-        if (!t.trim()) return;
-        const ts = new Date();
-        const pad = (n) => String(n).padStart(2, "0");
-        const name = `gap-analysis-${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}.md`;
-        exportText(name, t + "\n");
-        alert("已导出");
       });
 
       btnGenerate.addEventListener("click", async () => {
