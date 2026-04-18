@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       referrerpolicy="no-referrer"
     />
+    <script src="analytics.js"></script>
 
     <script>
       tailwind.config = {
@@ -200,6 +201,22 @@
                 class="mt-4 h-64 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
                 placeholder="生成后会在这里提供可导出的 Markdown…"
               ></textarea>
+            </div>
+
+            <!-- 下一步：去模拟面试 -->
+            <div class="rounded-3xl border border-indigo-100 bg-indigo-50 p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold text-indigo-900">准备好面试了吗？</div>
+                  <div class="mt-1 text-sm text-indigo-700">基于目标岗位和简历，AI 将生成针对性的面试问题。</div>
+                </div>
+                <a
+                  href="interview.html"
+                  class="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                >
+                  <i class="fa-solid fa-comments mr-2"></i>去模拟面试
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -425,6 +442,11 @@
         if ((jd || "").trim().length < 20 && !target_job) {
           alert("请先补齐 JD（至少 20 字）或选择目标岗位。");
           return;
+        }
+
+        // 埋点：使用能力差距分析
+        if (window.Analytics) {
+          Analytics.trackFeature('gapAnalysis', { targetJob: target_job?.title || 'custom' });
         }
 
         document.getElementById("emptyState").classList.add("hidden");

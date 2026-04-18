@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       referrerpolicy="no-referrer"
     />
+    <script src="analytics.js"></script>
 
     <script>
       tailwind.config = {
@@ -429,6 +430,11 @@
         if ((resume || "").trim().length < 50) {
           alert("请先在「简历诊断」页面填写/上传简历（至少 50 字）。");
           return;
+        }
+
+        // 埋点：使用岗位推荐
+        if (window.Analytics) {
+          Analytics.trackFeature('jobRecommendation', { persona: persona.level, city: persona.city });
         }
 
         document.getElementById("emptyState").classList.add("hidden");

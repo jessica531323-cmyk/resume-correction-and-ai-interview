@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       referrerpolicy="no-referrer"
     />
+    <script src="analytics.js"></script>
 
     <script>
       tailwind.config = {
@@ -283,11 +284,28 @@
               <div id="suggestions" class="mt-4 space-y-3"></div>
             </div>
 
+            <!-- 生成完整版新简历按钮 -->
+            <div id="generateRewriteCard" class="rounded-3xl border border-indigo-100 bg-indigo-50 p-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-extrabold text-indigo-900">需要完整改写版本？</div>
+                  <div class="mt-1 text-sm text-indigo-700">基于诊断结果，AI 将为你生成可直接投递的完整简历。</div>
+                </div>
+                <button
+                  id="btnGenerateRewrite"
+                  class="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                  type="button"
+                >
+                  <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>生成完整版新简历
+                </button>
+              </div>
+            </div>
+
             <div id="rewriteCard" class="hidden rounded-3xl border border-slate-200 bg-white p-5">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div class="text-sm font-extrabold">完整改写简历（可导出）</div>
-                  <div class="mt-1 text-sm text-slate-600">基于你的原简历与岗位要求生成，可直接复制或导出文件。</div>
+                  <div class="mt-1 text-sm text-slate-600">基于你的原简历与岗位要求生成，纯文本格式可直接复制或导出。</div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                   <button
@@ -302,14 +320,14 @@
                     class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
                     type="button"
                   >
-                    <i class="fa-solid fa-download mr-2"></i>导出 .md
+                    <i class="fa-solid fa-download mr-2"></i>导出 .txt
                   </button>
                 </div>
               </div>
               <textarea
                 id="rewrittenResume"
                 class="mt-4 h-64 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none ring-slate-900/10 focus:bg-white focus:ring-4"
-                placeholder="诊断完成后会在这里生成完整改写简历…"
+                placeholder="诊断完成后会在这里生成完整改写简历（纯文本格式）…"
               ></textarea>
             </div>
 
@@ -731,17 +749,26 @@
       function renderRewrite(text) {
         const card = document.getElementById("rewriteCard");
         const ta = document.getElementById("rewrittenResume");
+        const generateCard = document.getElementById("generateRewriteCard");
         if ((text || "").trim()) {
           card.classList.remove("hidden");
           ta.value = text.trim();
+          // 隐藏"生成完整版"提示区域，因为结果已经显示
+          if (generateCard) {
+            generateCard.classList.add("hidden");
+          }
         } else {
           card.classList.add("hidden");
           ta.value = "";
+          // 显示"生成完整版"提示区域
+          if (generateCard) {
+            generateCard.classList.remove("hidden");
+          }
         }
       }
 
       function exportText(filename, text) {
-        const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -768,9 +795,25 @@
         if (!t) return showToast("没有可导出的内容", "warn");
         const ts = new Date();
         const pad = (n) => String(n).padStart(2, "0");
-        const name = `resume-rewrite-${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}.md`;
+        const name = `resume-rewrite-${ts.getFullYear()}${pad(ts.getMonth() + 1)}${pad(ts.getDate())}.txt`;
         exportText(name, t + "\n");
         showToast("已导出文件", "ok");
+      });
+
+      // 生成完整版新简历按钮点击事件
+      document.getElementById("btnGenerateRewrite").addEventListener("click", () => {
+        // 滚动到完整改写简历区域
+        const rewriteCard = document.getElementById("rewriteCard");
+        if (!rewriteCard.classList.contains("hidden")) {
+          // 如果已经生成过，直接滚动显示
+          rewriteCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          showToast("已生成完整简历，请查看下方", "ok");
+        } else {
+          // 如果还没生成，提示用户先进行诊断
+          showToast("请先点击「开始诊断」生成简历改写", "warn");
+          // 滚动到诊断按钮
+          document.getElementById("btnAnalyze").scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
 
       // COT (Chain of Thought) steps for resume diagnosis
@@ -791,6 +834,11 @@
           return;
         }
         saveInputs();
+
+        // 埋点：使用简历诊断
+        if (window.Analytics) {
+          Analytics.trackFeature('resumeDiagnosis', { jdLength: jd.length, resumeLength: resume.length });
+        }
 
         const btn = document.getElementById("btnAnalyze");
         const oldHtml = btn.innerHTML;
@@ -881,6 +929,12 @@
         try {
           const file = e.target.files && e.target.files[0];
           if (!file) return;
+          
+          // 埋点：上传 JD
+          if (window.Analytics) {
+            Analytics.trackFeature('uploadJD', { fileName: file.name, fileSize: file.size });
+          }
+          
           setUploadUI(jdUpload, "reading", {
             name: file.name,
             size: formatBytes(file.size),
@@ -916,6 +970,12 @@
         try {
           const file = e.target.files && e.target.files[0];
           if (!file) return;
+          
+          // 埋点：上传简历
+          if (window.Analytics) {
+            Analytics.trackFeature('uploadResume', { fileName: file.name, fileSize: file.size });
+          }
+          
           setUploadUI(resumeUpload, "reading", {
             name: file.name,
             size: formatBytes(file.size),

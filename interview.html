@@ -12,6 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       referrerpolicy="no-referrer"
     />
+    <script src="analytics.js"></script>
 
     <script>
       tailwind.config = {
@@ -442,6 +443,11 @@
 
         document.getElementById("emptyState").classList.add("hidden");
         document.getElementById("result").classList.add("hidden");
+        
+        // 埋点：使用 AI 模拟面试
+        if (window.Analytics) {
+          Analytics.trackFeature('aiInterview', { targetJob: target_job?.title || 'custom' });
+        }
         
         // Start COT animation
         let currentStep = 0;

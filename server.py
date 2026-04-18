@@ -122,7 +122,7 @@ Schema:
   "suggestions": Array<{{ "title": string, "example": string, "priority": "P0"|"P1"|"P2" }}>,
   "highlights": Array<string>,
   "rewritten_resume": string,
-  "export_format": "markdown"
+  "export_format": "text"
 }}
 
 Hard requirements:
@@ -130,7 +130,7 @@ Hard requirements:
 - Avoid generic or empty advice. If JD is vague, infer missing detail by asking the candidate to add specifics, but still produce concrete rewrite templates.
 - For projects/internships: extract/produce detailed bullets with context, scope, constraints, decisions, trade-offs, and measurable outcomes.
 - Data must follow product/operation logic: define metric, baseline, method, funnel/retention or efficiency logic, impact, and how measured.
-- Provide a full rewritten resume in Chinese as Markdown (ready to paste) with improved structure and quantified achievements.
+- Provide a full rewritten resume in Chinese as PLAIN TEXT (ready to paste) with improved structure and quantified achievements. Use simple formatting with clear section headers and bullet points, NO Markdown syntax like # or **.
 - Keep: issues 8-12, suggestions 6-10, highlights 3-6."""
 
     user = f"Job Description (JD):\n{jd}\n\nResume:\n{resume}"
