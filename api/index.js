@@ -256,23 +256,44 @@ app.post("/api/interview-questions", async (req, res) => {
   const { target_job, jd, resume, locale } = req.body;
   const model = getLLMConfig().model || "gpt-4.1-mini";
 
-  const system = `You are a realistic interviewer for the target role.
-Return STRICT JSON only. No markdown, no extra keys.
+  const system = `You are a senior interviewer for the target role. Return STRICT JSON only.
 Language: ${locale || "zh-CN"}.
 
 Schema:
 {
-  "project_deep_dive": Array<{ "question": string, "intent": string, "follow_ups": Array<string> }>,
+  "project_deep_dive": Array<{
+    "project_name": string,
+    "questions": Array<{
+      "question": string,
+      "intent": string,
+      "follow_ups": Array<string>
+    }>
+  }>,
   "behavioral": Array<{ "question": string, "intent": string, "follow_ups": Array<string> }>,
   "role_specific": Array<{ "question": string, "intent": string, "follow_ups": Array<string> }>,
+  "situational": Array<{ "scenario": string, "question": string, "intent": string }>,
   "export_markdown": string
 }
 
-Rules:
-- Ground questions in resume projects; ask for specifics (scope, trade-offs, metrics, failures).
-- Follow-ups must be sharp and realistic.
-- Keep responses CONCISE: 2-3 projects with 2-3 questions each, 3-4 behavioral questions, 2-3 role-specific questions.
-- Use short, direct sentences.`;
+Interview Focus:
+1. Project Deep Dive: For EACH实习/项目经历 in resume, ask:
+   - What did you do? (specific tasks)
+   - Why did you do it? (business rationale)
+   - How did you measure success? (data/metrics)
+   - What was the outcome? (quantified results)
+   - What would you do differently? (reflection)
+
+2. Behavioral: STAR method questions about teamwork, conflict, pressure.
+
+3. Role Specific: Technical questions based on JD requirements.
+
+4. Situational: Hypothetical scenarios related to the role.
+
+Requirements:
+- Extract ALL实习/项目经历 from resume, generate 3-5 questions per project.
+- Follow-ups must drill deeper into details.
+- Include data/metrics questions for every project.
+- Situational questions must be realistic job scenarios.`;
 
   const user = `Target Job: ${JSON.stringify(target_job)}
 JD: ${jd || ""}
