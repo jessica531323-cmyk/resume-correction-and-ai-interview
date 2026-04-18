@@ -287,8 +287,9 @@
         const bar = document.getElementById("progressBar");
         const t = document.getElementById("progressText");
         card.classList.remove("hidden");
-        bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
-        t.textContent = text || "进行中…";
+        const progress = Math.max(0, Math.min(100, pct));
+        bar.style.width = `${progress}%`;
+        t.textContent = `${progress}% ${text || "进行中…"}`;
       }
 
       function hideProgress() {
@@ -447,7 +448,16 @@
 
         btnGenerate.disabled = true;
         const oldHtml = btnGenerate.innerHTML;
-        btnGenerate.innerHTML = `<i class="fa-solid fa-spinner mr-2 animate-spin"></i>生成中…`;
+        let progressPercent = 0;
+        const progressInterval = setInterval(() => {
+          progressPercent = Math.min(90, progressPercent + Math.random() * 15);
+          btnGenerate.innerHTML = `<i class="fa-solid fa-spinner mr-2 animate-spin"></i>生成中 ${Math.round(progressPercent)}%`;
+        }, 800);
+        
+        const stopProgress = () => {
+          clearInterval(progressInterval);
+          btnGenerate.innerHTML = oldHtml;
+        };
         try {
           const r = await fetch("/api/gap-analysis", {
             method: "POST",
@@ -467,12 +477,13 @@
           localStorage.setItem(StorageKeys.lastGap, JSON.stringify(j));
           renderResult(j);
           hideProgress();
+          stopProgress();
         } catch (e) {
           hideProgress();
+          stopProgress();
           alert(e.message || "生成失败");
         } finally {
           btnGenerate.disabled = !elAiBadge.textContent.includes("已启用");
-          btnGenerate.innerHTML = oldHtml;
         }
       });
 

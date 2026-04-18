@@ -200,8 +200,7 @@ app.post("/api/gap-analysis", async (req, res) => {
   const { target_job, jd, resume, locale } = req.body;
   const model = getLLMConfig().model || "gpt-4.1-mini";
 
-  const system = `You are a career strategist for China job market.
-Return STRICT JSON only. No markdown, no extra keys.
+  const system = `You are a career strategist. Return STRICT JSON only.
 Language: ${locale || "zh-CN"}.
 
 Schema:
@@ -209,16 +208,16 @@ Schema:
   "summary": string,
   "missing_skills": Array<{ "skill": string, "why": string, "evidence_gap": string, "how_to_gain": Array<string>, "priority": "P0"|"P1"|"P2" }>,
   "project_suggestions": Array<{ "title": string, "goal": string, "scope": Array<string>, "tech_stack": Array<string>, "metrics": Array<string> }>,
-  "action_plan": Array<{ "week": number, "goal": string, "actions": Array<string>, "deliverable": string, "success_metric": string }>,
+  "action_plan": Array<{ "week": number, "goal": string, "actions": Array<string>, "deliverable": string }>,
   "export_markdown": string
 }
 
-Rules:
-- summary: A concise summary of the gap analysis (2-3 sentences).
-- missing_skills: 5-8 skills missing based on JD vs resume comparison.
-- project_suggestions: 2-3 project ideas to fill the gaps.
-- action_plan: A 7-day actionable plan.
-- export_markdown: A formatted summary report.`;
+Requirements:
+- summary: 1-2 sentences only.
+- missing_skills: 4-6 key skills, be specific.
+- project_suggestions: 2 concise project ideas.
+- action_plan: 4 weeks, keep actions brief.
+- Be concise to reduce token usage.`;
 
   const user = `Target Job: ${JSON.stringify(target_job)}
 JD: ${jd || ""}
