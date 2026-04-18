@@ -12,7 +12,14 @@ const app = express();
 app.disable("x-powered-by");
 
 app.use(express.json({ limit: "2mb" }));
-app.use(express.static(projectRoot));
+
+// Serve static files - different paths for local vs Vercel
+if (process.env.VERCEL) {
+  // On Vercel, static files are served from the root
+  app.use(express.static(projectRoot));
+} else {
+  app.use(express.static(projectRoot));
+}
 
 function getLLMConfig() {
   const apiKey = process.env.LLM_API_KEY || process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY || "";
