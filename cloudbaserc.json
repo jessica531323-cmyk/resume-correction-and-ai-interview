@@ -1,13 +1,13 @@
 {
   "version": "2.0",
-  "envId": "你的环境ID",
+  "envId": "resume-d1gq95ipu35e0468e",
   "functionRoot": "functions",
   "functions": [
     {
       "name": "api",
       "timeout": 60,
       "envVariables": {
-        "LLM_API_KEY": "你的API密钥",
+        "LLM_API_KEY": "ark-a75f5e2c-00b1-4423-8fb2-d1a3d8496115-8bda6",
         "LLM_BASE_URL": "https://ark.cn-beijing.volces.com/api/v3",
         "LLM_MODEL": "deepseek-v3-2-251201"
       }
